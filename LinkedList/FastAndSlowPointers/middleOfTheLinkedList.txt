@@ -1,1 +1,57 @@
 LeetCode : https://leetcode.com/problems/middle-of-the-linked-list/description/
+
+Solution #1 : Using recursion : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    int up = 0;
+    int down = 0;
+    ListNode ans = new ListNode();
+    public ListNode middleNode(ListNode head) {
+        if(head.next == null){
+            up += 1;
+            down = up/2;
+            if(down == up-1){
+                ans = head;
+            }
+            return head;
+        }
+
+        up += 1;
+        middleNode(head.next);
+        up -= 1;
+        if(up-1 == down){
+            ans = head;
+        }
+        return ans;
+    }
+}
+
+
+Solution #2 : Iterative solution :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        if(head.next == null){
+            return head;
+        }
+
+        int length = 0;
+        ListNode ans = head;
+
+        while(ans != null){
+            length += 1;
+            ans = ans.next;
+        }
+
+        int mid = length/2;
+        ans = head;
+        while(mid != 0){
+            ans = ans.next;
+            mid -= 1;
+        }
+
+        return ans;
+    }
+}
