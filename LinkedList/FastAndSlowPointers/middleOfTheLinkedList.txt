@@ -55,3 +55,27 @@ class Solution {
         return ans;
     }
 }
+
+Solution #3 : Fast and slow pointer :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        if(head.next == null){
+            return head;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head.next;
+
+        while(fast != null){
+            fast = fast.next;
+            if(fast != null){
+                fast = fast.next;
+            }
+            slow = slow.next;
+        }
+
+        return slow;
+    }
+}
