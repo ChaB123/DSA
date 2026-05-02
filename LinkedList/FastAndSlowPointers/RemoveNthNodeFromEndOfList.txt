@@ -1,0 +1,66 @@
+LeetCode : https://leetcode.com/problems/remove-nth-node-from-end-of-list/description/
+
+Solution #1 : Iterative Solution :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        int length = 0;
+        ListNode pointer = head;
+
+        while(pointer != null){
+            length += 1;
+            pointer = pointer.next;
+        }
+
+        int toRemove = length-n-1;
+        pointer = head;
+
+        if(toRemove == -1){
+            return pointer.next;
+        }
+
+        while(toRemove != 0){
+            pointer = pointer.next;
+            toRemove -= 1;
+        }
+
+        pointer.next = pointer.next.next;
+        return head;
+    }
+}
+========================================
+
+Solution #2 : Iterative Solution, with one pass and fast & slow pointers :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        //we need dummy so that if we need to remove the first node then we would have something previous to head.
+        ListNode dummy = new ListNode();
+        dummy.next = head;
+
+        ListNode slow = dummy;
+        ListNode fast = dummy;
+        int gap = n+1;
+
+        while(fast != null){
+            //move fast pointer to n gap with slow and fast
+            while(fast != null && gap != 0){
+                fast = fast.next;
+                gap -= 1;
+            }
+
+            if(fast == null){
+                break;
+            }
+
+            //now, there is n gap between fast & slow. Move together now.
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        slow.next = slow.next.next;
+        return dummy.next;
+    }
+}
