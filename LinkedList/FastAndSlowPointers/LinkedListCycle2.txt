@@ -1,0 +1,66 @@
+LeetCode : https://leetcode.com/problems/linked-list-cycle-ii/description/
+
+Solution #1 : Iterative Solution :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        if(head == null){
+            return null;
+        }
+
+        ListNode slow = head;
+        HashSet<ListNode> test = new HashSet<>();
+
+        while(slow != null){
+            test.add(slow);
+
+            if(test.contains(slow.next)){
+                return slow.next;
+            }
+
+            slow = slow.next;
+        }
+
+        return null;
+    }
+}
+
+========================================
+
+Solution #2 : Iterative Solution :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        if(head == null){
+            return null;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+            
+            if(slow == fast){
+                break;
+            }
+        }
+
+        if(slow == fast){
+            slow = head;
+            while(slow != null && slow.next != null){
+                if(fast == slow){
+                    return fast;
+                }
+
+                fast = fast.next;
+                slow = slow.next;
+            }
+        }
+
+        return null;
+    }
+} 
