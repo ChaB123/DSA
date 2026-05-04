@@ -1,0 +1,27 @@
+LeetCode : https://leetcode.com/problems/remove-duplicates-from-sorted-list/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode headNext = head.next;
+        ListNode ans = head;
+
+        while(headNext != null){
+            if(headNext.val == head.val){
+                head.next = headNext.next;
+            }else{
+                head = head.next;
+            }
+            
+            headNext = headNext.next;
+        }
+
+        return ans;
+    }
+}
