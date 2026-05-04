@@ -1,0 +1,27 @@
+LeetCode : https://leetcode.com/problems/delete-node-in-a-linked-list/description/
+
+Solution #1 : Iterative Solution :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public void deleteNode(ListNode node) {
+        /*
+        Idea :
+        -> Start two pointer from node & node.next
+        -> Keep replacing values from (node.next).val -> node.val
+        -> once (node.next) == null, then mark node.next = null
+        */
+
+        ListNode start = node;
+        ListNode nextElement = node.next;
+
+        while(nextElement.next != null){
+            start.val = nextElement.val;
+            start = start.next;
+            nextElement = nextElement.next;
+        }
+
+        start.val = nextElement.val;
+        start.next = null;
+    }
+}
