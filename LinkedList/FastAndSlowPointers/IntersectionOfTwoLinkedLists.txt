@@ -1,0 +1,96 @@
+LeetCode : https://leetcode.com/problems/intersection-of-two-linked-lists/description/
+
+
+Solution #1 : Iterative :
+Time Complexity : O(m+n), Space Complexity : O(m+n) :
+
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        HashSet<ListNode> tmp = new HashSet<>();
+
+        while(headA != null && headB != null){
+            if(tmp.contains(headA)){
+                return headA;
+            }else if(tmp.contains(headB)){
+                return headB;
+            }else if(headA == headB){
+                return headA;
+            }
+
+            tmp.add(headA);
+            tmp.add(headB);
+
+            headA = headA.next;
+            headB = headB.next;
+        }
+
+        while(headA != null){
+            if(tmp.contains(headA)){
+                return headA;
+            }
+            headA = headA.next;
+        }
+
+        while(headB != null){
+            if(tmp.contains(headB)){
+                return headB;
+            }
+            headB = headB.next;
+        }
+
+        return null;
+    }
+}
+
+========================================
+
+Solution #2 : Iterative :
+Time Complexity : O(m+n), Space Complexity : O(1) :
+
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        int sizeA = 0;
+        int sizeB = 0;
+
+        ListNode pointerA = headA;
+        ListNode pointerB = headB;
+
+        while(pointerA != null){
+            sizeA += 1;
+            pointerA = pointerA.next;
+        }
+
+        while(pointerB != null){
+            sizeB += 1;
+            pointerB = pointerB.next;
+        }
+
+        pointerA = headA;
+        pointerB = headB;
+
+        if(sizeA > sizeB){
+            int toIncrease = sizeA-sizeB;
+            while(toIncrease != 0){
+                toIncrease -= 1;
+                pointerA = pointerA.next;
+            }
+        }else if(sizeA < sizeB){
+            int toIncrease = sizeB-sizeA;
+            while(toIncrease != 0){
+                toIncrease -= 1;
+                pointerB = pointerB.next;
+            }
+        }
+
+        while(pointerA != null && pointerB != null){
+            if(pointerB == pointerA){
+                return pointerB;
+            }
+
+            pointerB = pointerB.next;
+            pointerA = pointerA.next;
+        }
+
+        return null;
+    }
+}
