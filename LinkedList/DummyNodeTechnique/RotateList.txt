@@ -1,0 +1,58 @@
+LeetCode : https://leetcode.com/problems/rotate-list/description/
+
+Solution #1 : Iterative Solution :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode rotateRight(ListNode head, int k) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        /*
+        -> Determine size of the linked list
+        -> Determine first half of linked list using size & k
+        -> Traverse until first half of array, i.e : upto tail
+        -> Immediate next element will be our new head, then join the linked list
+        */
+
+        int size = 0;
+        ListNode start = head;
+        while(start != null){
+            size += 1;
+            start = start.next;
+        }
+
+        int secondHalfLength = k%size;
+
+        if(secondHalfLength == 0){
+            return head;
+        }
+
+        int newFirstHalfLength = size-secondHalfLength;
+
+        start = head;
+        ListNode newTail = null;
+        ListNode newHead = null;
+
+        while(newFirstHalfLength != 0){
+            newFirstHalfLength -= 1;
+
+            if(newFirstHalfLength == 0){
+                newTail = start;
+            }
+
+            start = start.next;
+        }
+        newHead = start;
+
+        while(start.next != null){
+            start = start.next;
+        }
+
+        start.next = head;
+        newTail.next = null;
+
+        return newHead;
+    }
+}
