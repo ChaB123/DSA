@@ -1,0 +1,51 @@
+LeetCode : https://leetcode.com/problems/partition-list/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode partition(ListNode head, int x) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode startOfSmall = null;
+        ListNode small = null;
+        ListNode startOfHigh = null;
+        ListNode high = null;
+
+        while(head != null){
+            if(head.val < x){
+                if(small == null){
+                    startOfSmall = head;
+                    small = head;
+                }else{
+                    small.next = head;
+                    small = small.next;
+                }
+            }else{
+                if(high == null){
+                    startOfHigh = head;
+                    high = head;
+                }else{
+                    high.next = head;
+                    high = high.next;
+                }
+            }
+
+            head = head.next;
+        }
+
+        if(small != null){
+            small.next = startOfHigh;
+        }else{
+            return startOfHigh;
+        }
+
+        if(high != null){
+            high.next = null;
+        }
+
+        return startOfSmall;
+    }
+}
