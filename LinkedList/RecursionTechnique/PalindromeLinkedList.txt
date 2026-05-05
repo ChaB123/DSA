@@ -1,0 +1,59 @@
+LeetCode : https://leetcode.com/problems/palindrome-linked-list/description/
+
+Solution #1 : Recursion :
+Time Complexity : O(n), Space Complexity : O(2n) = O(n) :
+
+class Solution {
+    StringBuilder sb = new StringBuilder("");
+    int index = -1;
+    
+    public boolean isPalindrome(ListNode head) {
+        if(head == null){
+            return true;
+        }
+
+        sb.append(head.val);
+        boolean previousResult = isPalindrome(head.next);
+        index += 1;
+
+        //if previousResult is false, meaning string is not palindrome. Meaning, we need to return false always.
+        if(previousResult && head.val == sb.charAt(index)-'0'){
+            return true;
+        }
+
+        return false;
+    }
+}
+
+========================================
+
+Solution #2 : Recursion :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    ListNode front = null;
+
+    public boolean isPalindrome(ListNode head) {
+        front = head;
+        return check(head);
+    }
+    public boolean check(ListNode head){
+        if(head == null){
+            return true;
+        }
+
+        boolean previousResult = check(head.next);
+
+        if(!previousResult){
+            //if previously, we found that linked list isn't palindrome. There is no need to check further.
+            return false;
+        }
+
+        if(head.val != front.val){
+            return false;
+        }
+
+        front = front.next;
+        return true;
+    }
+}
