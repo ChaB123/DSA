@@ -1,0 +1,96 @@
+LeetCode : https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/description/
+
+Solution #1 : Recursion :
+Time Complexity : O(n^2), Space Complexity : O(n) :
+
+class Solution {
+    public Node flatten(Node head) {
+        // case 1 : if no child & next is present (base case)
+        if(head == null || (head.next == null && head.child == null)){
+            return head;
+        }
+
+        // case 2 : if no child is present, but next element is present
+        if(head.child == null && head.next != null){
+            Node tmp = flatten(head.next);
+            head.next = tmp;
+            tmp.prev = head;
+            return head;
+        }
+
+        // case 3 : if child is present but no next element
+        if(head.child != null && head.next == null){
+            Node tmp = flatten(head.child);
+            tmp.prev = head;
+            head.next = tmp;
+            head.child = null;
+            return head;
+        }
+
+        // case 4 : both child & next is present
+        Node nextElement = head.next;
+        Node firstChild = head.child;
+        head.child = null;
+        head.next = firstChild;
+        firstChild.prev = head;
+        flatten(head.next);
+        Node lastChild = returnLastNode(head);
+        lastChild.next = nextElement;
+        nextElement.prev = lastChild;
+        flatten(nextElement);
+        return head;
+    }
+    public Node returnLastNode(Node tmp){
+        if(tmp == null || tmp.next == null){
+            return tmp;
+        }
+        
+        return returnLastNode(tmp.next);
+    }
+}
+
+========================================
+
+Solution #2 : Recursion :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    Node lastTail = null;
+    public Node flatten(Node head) {
+        // case 1 : if no child & next is present (base case)
+        if(head == null || (head.next == null && head.child == null)){
+            lastTail = head;
+            return head;
+        }
+
+        // case 2 : if no child is present, but next element is present
+        if(head.child == null && head.next != null){
+            Node tmp = flatten(head.next);
+            head.next = tmp;
+            tmp.prev = head;
+            return head;
+        }
+
+        // case 3 : if child is present but no next element
+        if(head.child != null && head.next == null){
+            Node tmp = flatten(head.child);
+            tmp.prev = head;
+            head.next = tmp;
+            head.child = null;
+            return head;
+        }
+
+        // case 4 : both child & next is present
+        Node nextElement = head.next;
+        Node firstChild = head.child;
+        head.child = null;
+        head.next = firstChild;
+        firstChild.prev = head;
+        flatten(head.next);
+        Node lastChild = lastTail;
+        lastChild.next = nextElement;
+        nextElement.prev = lastChild;
+        flatten(nextElement);
+        return head;
+    }
+}
