@@ -1,0 +1,50 @@
+LeetCode : https://leetcode.com/problems/reverse-linked-list-ii/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode previous = null;
+        ListNode current = head;
+        ListNode nextElement = head.next;
+        int index = 1;
+
+        // skip the front part
+        while(head != null && left != index){
+            previous = current;
+            current = current.next;
+            index += 1;
+        }
+
+        // update the nextElement, store the elements at position (left-1) & left
+        nextElement = current.next;
+        ListNode previousNodeFromStartOfReversal = previous;
+        ListNode startNodeOfReversal = current;
+
+        // complete the swap
+        while(nextElement != null & right != index){
+            current.next = previous;
+            previous = current;
+            current = nextElement;
+            nextElement = nextElement.next;
+            index += 1;
+        }
+        current.next = previous;
+
+        // point (left-1) -> (last element after swap) & (first element of swap, i.e : left) -> nextElement
+        startNodeOfReversal.next = nextElement;
+
+        if(left == 1){
+            head = current;
+        }else{
+            previousNodeFromStartOfReversal.next = current;
+        }
+
+        return head;
+    }
+}
