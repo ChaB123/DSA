@@ -1,0 +1,55 @@
+LeetCode : https://leetcode.com/problems/reverse-linked-list/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode previous = null;
+        ListNode current = head;
+        ListNode nextElement = head.next;
+
+        while(nextElement != null){
+            current.next = previous;
+            previous = current;
+            current = nextElement;
+            nextElement = nextElement.next;
+        }
+
+        current.next = previous;
+        return current;
+    }
+}
+
+========================================
+
+Solution #2 : Recursion :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    ListNode lastNode = null;
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null){
+            lastNode = head;
+            return head;
+        }
+
+        ListNode newLastNode = test(head);
+        newLastNode.next = null;
+        return lastNode;
+    }
+    public ListNode test(ListNode head){
+        if(head == null || head.next == null){
+            lastNode = head;
+            return head;
+        }
+
+        ListNode previous = test(head.next);
+        previous.next = head;
+        return head;
+    }
+}
