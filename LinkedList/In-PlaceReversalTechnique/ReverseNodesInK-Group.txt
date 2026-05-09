@@ -1,0 +1,65 @@
+LeetCode : https://leetcode.com/problems/reverse-nodes-in-k-group/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+Note : Though each node is visited twice. This is the optimal solution I could come up with :
+
+class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode newHead = null;
+        int tmpK = k;
+        ListNode pointer = head;
+        ListNode previousTail = null;
+
+        while(pointer != null){
+            ListNode currentHead = pointer;
+
+            while(pointer != null && tmpK != 1){
+                pointer = pointer.next;
+                tmpK -= 1;
+            }
+            if(pointer == null){
+                break;
+            }
+            ListNode tmpNewHead = pointer.next;
+            ListNode headOfReversedNode = reverse(currentHead, pointer);
+
+            if(newHead == null){
+                newHead = headOfReversedNode;
+            }
+
+            currentHead.next = tmpNewHead;
+            if(previousTail != null){
+                previousTail.next = headOfReversedNode;
+            }
+
+            previousTail = currentHead;
+            pointer = tmpNewHead;
+            tmpK = k;
+        }
+        return newHead;
+    }
+    public ListNode reverse(ListNode start, ListNode end){
+        if(start == null || start.next == null){
+            return start;
+        }
+
+        ListNode previousNode = null;
+        ListNode current = start;
+        ListNode nextElement = start.next;
+
+        while(nextElement != end.next){
+            current.next = previousNode;
+            previousNode = current;
+            current = nextElement;
+            nextElement = nextElement.next;
+        }
+        current.next = previousNode;
+        return current;
+    }
+}
