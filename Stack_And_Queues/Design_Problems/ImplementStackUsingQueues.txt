@@ -1,0 +1,29 @@
+LeetCode : https://leetcode.com/problems/implement-stack-using-queues/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class MyStack {
+
+    Deque<Integer> deQue = new ArrayDeque<Integer>();
+
+    public MyStack() {
+        
+    }
+    
+    public void push(int x) {
+        deQue.addFirst(x);
+    }
+    
+    public int pop() {
+        return deQue.poll();
+    }
+    
+    public int top() {
+        return deQue.peek();
+    }
+    
+    public boolean empty() {
+        return deQue.isEmpty();
+    }
+}
