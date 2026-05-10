@@ -1,0 +1,59 @@
+LeetCode : https://leetcode.com/problems/reverse-nodes-in-even-length-groups/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public ListNode reverseEvenLengthGroups(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        int length = 1;
+        ListNode pointer = head;
+        while(pointer != null && pointer.next != null){
+            length += 1;
+
+            int tmpLength = length;
+            ListNode previousElementFromStartOfNextComponent = pointer;
+            while(pointer.next != null && tmpLength != 0){
+                pointer = pointer.next;
+                tmpLength -= 1;
+            }
+
+            if(tmpLength != 0){
+                length -= tmpLength;
+            }
+
+            if(length%2 == 0 && length >= 0){
+                ListNode headOfNextGroup = pointer.next;
+                ListNode tailOfReversedNode = previousElementFromStartOfNextComponent.next;
+                ListNode headOfReversedNode = reverse(previousElementFromStartOfNextComponent.next, headOfNextGroup);
+                previousElementFromStartOfNextComponent.next = headOfReversedNode;
+                tailOfReversedNode.next = headOfNextGroup;
+                pointer = tailOfReversedNode;
+            }
+        }
+
+        return head;
+    }
+    public ListNode reverse(ListNode start, ListNode end){
+        if(start == null || start.next == null){
+            return start;
+        }
+
+        ListNode previous = null;
+        ListNode current = start;
+        ListNode nextElement = start.next;
+
+        while(nextElement != end){
+            current.next = previous;
+            previous = current;
+            current = nextElement;
+            nextElement = nextElement.next;
+        }
+        current.next = previous;
+
+        return current;
+    }
+}
