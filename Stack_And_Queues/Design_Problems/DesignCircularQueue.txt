@@ -1,0 +1,131 @@
+LeetCode : https://leetcode.com/problems/design-circular-queue/description/
+
+Solution #1 : Iterative :
+Time Complexity : O(n^2), because dequeue take O(n) time, Space Complexity : O(n) :
+
+class MyCircularQueue {
+    ArrayList<Integer> test = new ArrayList<>();
+    int size = 0;
+    int head = 0;
+
+    public MyCircularQueue(int k) {
+        size = k;
+    }
+    
+    public boolean enQueue(int value) {
+        if(head == size){
+            return false;
+        }
+
+        test.add(value);
+        head += 1;
+        return true;
+    }
+    
+    public boolean deQueue() {
+        if(test.size() == 0){
+            return false;
+        }
+
+        test.remove(0);
+        head -= 1;
+        return true;
+    }
+    
+    public int Front() {
+        if(test.size() == 0){
+            return -1;
+        }
+
+        return test.get(0);
+    }
+    
+    public int Rear() {
+        if(test.size() == 0){
+            return -1;
+        }
+
+        return test.get(head-1);
+    }
+    
+    public boolean isEmpty() {
+        return test.size() == 0;
+    }
+    
+    public boolean isFull() {
+        return head == size;
+    }
+}
+
+========================================
+
+Solution #2 : Iterative :
+Time Complexity : O(n), each operation takes amortized O(1), Space Complexity : O(n) :
+
+class MyCircularQueue {
+    int[] arr = {};
+    int front = 0;
+    int rear = 0;
+    int count = 0;
+
+    public MyCircularQueue(int k) {
+        arr = new int[k];
+    }
+    
+    public boolean enQueue(int value) {
+        rear %= arr.length;
+
+        if(count == arr.length){
+            return false;
+        }
+
+        arr[rear] = value;
+        rear += 1;
+        count += 1;
+        return true;
+    }
+    
+    public boolean deQueue() {
+        front %= arr.length;
+
+        if(count == 0){
+            return false;
+        }
+
+        front += 1;
+        count -= 1;
+        return true;
+    }
+    
+    public int Front() {
+        front %= arr.length;
+
+        if(count == 0){
+            return -1;
+        }
+
+        return arr[front];
+    }
+    
+    public int Rear() {
+        rear %= arr.length;
+
+        if(count == 0){
+            return -1;
+        }
+
+        if(rear == 0 && count > 0){
+            return arr[arr.length-1];
+        }
+
+        return arr[rear-1];
+    }
+    
+    public boolean isEmpty() {
+        return count == 0;
+    }
+    
+    public boolean isFull() {
+        return count == arr.length;
+    }
+}
