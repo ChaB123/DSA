@@ -1,3 +1,122 @@
 LeetCode : https://leetcode.com/problems/maximum-frequency-stack/description/
 
-Solution #1 : 
+Solution #1 : Iterative :
+Note : This code gives TLE because max input that can be passed is 2*10^4 & pop operation takes O(n) time. Hence, overall complexity becomes O(n^2) = O(10^8) = TLE.
+
+Time Complexity : O(n^2), Space Complexity : O(n) :
+
+class FreqStack {
+    HashMap<Integer, Integer> frequency = new HashMap<>();
+    Stack<Integer> store = new Stack<>();
+
+    public FreqStack() {
+        
+    }
+    
+    public void push(int val) {
+        store.push(val);
+        if(frequency.containsKey(val)){
+            frequency.put(val, frequency.get(val)+1);
+        }else{
+            frequency.put(val, 1);
+        }
+    }
+    
+    public int pop() {
+        HashSet<Integer> sameFrequencyElements = new HashSet<>();
+        int max = 0;
+
+        for (Map.Entry<Integer, Integer> set : frequency.entrySet()) {
+            //System.out.println(set.getKey() +" -> "+ set.getValue());
+            if(set.getValue() == max){
+                sameFrequencyElements.add(set.getKey());
+            }else if(set.getValue() > max){
+                sameFrequencyElements.clear();
+                sameFrequencyElements.add(set.getKey());
+                max = set.getValue();
+            }
+        }
+
+        ArrayList<Integer> tmporarilyStoreStackValue = new ArrayList<>();
+        int toReturn = 0;
+        while(!store.isEmpty()){
+            int val = store.pop();
+            if(sameFrequencyElements.contains(val)){
+                toReturn = val;
+                frequency.put(toReturn, frequency.get(toReturn)-1);
+                break;
+            }else{
+                tmporarilyStoreStackValue.add(val);
+            }
+        }
+
+        for(int i=tmporarilyStoreStackValue.size()-1;i>=0;i--){
+            store.push(tmporarilyStoreStackValue.get(i));
+        }
+
+        return toReturn;
+    }
+}
+
+========================================
+
+Solution #2 : Iterative :
+Time Complexity : O(n), because n operation can be performed and push(), pop() operation takes O(1), Space Complexity : O(n) :
+
+class FreqStack {
+    /*
+    Idea :
+        value -> frequency
+        frequency -> stack
+        track current max frequency
+    */
+    
+    HashMap<Integer, Integer> frequency = new HashMap<>();
+    HashMap<Integer, Stack<Integer>> storeStack = new HashMap<>();
+    int maxKeyInStoreStack = 0;
+
+    public FreqStack() {
+        Stack<Integer> store = new Stack<>();
+        storeStack.put(1, store);
+    }
+    
+    public void push(int val) {
+        if(frequency.containsKey(val)){
+            int getFreq = frequency.get(val);
+            getFreq += 1;
+            maxKeyInStoreStack = Math.max(maxKeyInStoreStack, getFreq);
+            frequency.put(val, getFreq);
+
+            if(storeStack.containsKey(getFreq)){
+                Stack<Integer> store = storeStack.get(getFreq);
+                store.push(val);
+                //storeStack.put(getFreq, store); // don't need to update because it is referencing same memory
+            }else{
+                Stack<Integer> store = new Stack<>();
+                store.push(val);
+                storeStack.put(getFreq, store); // need to update because we formed new stack at new memory
+            }
+        }else{
+            maxKeyInStoreStack = Math.max(maxKeyInStoreStack, 1);
+            Stack<Integer> store = storeStack.get(1);
+            store.push(val);
+            //storeStack.put(1, store); // don't need to update because it is referencing same memory
+            frequency.put(val, 1);
+        }
+    }
+    
+    public int pop() {
+        //System.out.println("maxKeyInStoreStack : "+maxKeyInStoreStack);
+        Stack<Integer> store = storeStack.get(maxKeyInStoreStack);
+        int toReturn = store.pop();
+        frequency.put(toReturn, frequency.get(toReturn)-1);
+        //storeStack.put(maxKeyInStoreStack, store); // don't need to update because it is referencing same memory
+
+        if(store.size() == 0){
+            storeStack.remove(maxKeyInStoreStack);
+            maxKeyInStoreStack -= 1;
+        }
+
+        return toReturn;
+    }
+}
