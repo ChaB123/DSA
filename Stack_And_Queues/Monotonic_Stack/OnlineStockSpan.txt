@@ -1,0 +1,92 @@
+LeetCode : https://leetcode.com/problems/online-stock-span/description/
+
+Solution #1 : Iterative, this solution will give you TLE because of its time complexity. But, it will give you an idea of how to further optimise this code.
+
+Time Complexity : O(n^2), Space Complexity : O(n) :
+
+class StockSpanner {
+    Stack<Integer> store = new Stack<>();
+    public StockSpanner() {
+        
+    }
+    
+    public int next(int price) {
+        int ans = 1;
+        Stack<Integer> tmp = new Stack<>();
+        while(!store.isEmpty() && price >= store.peek()){
+            tmp.push(store.pop());
+            ans += 1;
+        }
+
+        while(!tmp.isEmpty()){
+            store.push(tmp.pop());
+        }
+
+        store.push(price);
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 : Iterative :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class StockSpanner {
+    Stack<HashMap<Integer, Integer>> store = new Stack<>();
+    public StockSpanner() {
+        
+    }
+    
+    public int next(int price) {
+        int ans = 1;
+        while(!store.isEmpty() && price >= store.peek().keySet().iterator().next()){
+            ans += store.pop().values().iterator().next();
+        }
+
+        HashMap<Integer, Integer> tmp = new HashMap<>();
+        tmp.put(price, ans);
+        store.push(tmp);
+        return ans;
+    }
+}
+
+========================================
+
+Solution #3 : Iterative : Exact same approach as Solution #2 but more light weight, because conceptually we only needed (price, its span) :
+
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class StockSpanner {
+    class PriceSpan{
+        int price;
+        int span;
+        public PriceSpan(int price, int span){
+            this.price = price;
+            this.span = span;
+        }
+
+        public int getPrice(){
+            return price;
+        }
+
+        public int getSpan(){
+            return span;
+        }
+    }
+    Stack<PriceSpan> store = new Stack<>();
+    public StockSpanner() {
+        
+    }
+    
+    public int next(int price) {
+        int ans = 1;
+        while(!store.isEmpty() && price >= store.peek().getPrice()){
+            ans += store.pop().getSpan();
+        }
+
+        PriceSpan obj = new PriceSpan(price, ans);
+        store.push(obj);
+        return ans;
+    }
+}
