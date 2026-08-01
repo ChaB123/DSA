@@ -1,0 +1,53 @@
+LeetCode : https://leetcode.com/problems/remove-duplicate-letters/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public String removeDuplicateLetters(String s) {
+        Stack<Character> store = new Stack<>();
+
+        HashMap<Character, Integer> frequency = new HashMap<>();
+        HashSet<Character> storeElements = new HashSet<>();
+
+        for(int i=0;i<s.length();i++){
+            if(frequency.containsKey(s.charAt(i))){
+                frequency.put(s.charAt(i), frequency.get(s.charAt(i))+1);
+            }else{
+                frequency.put(s.charAt(i), 1);
+            }
+        }
+
+        for(int index = 0;index < s.length();index++){
+            if(frequency.containsKey(s.charAt(index))){
+                if(frequency.get(s.charAt(index)) == 1){
+                    frequency.remove(s.charAt(index));
+                }else{
+                    frequency.put(s.charAt(index), frequency.get(s.charAt(index))-1);
+                }
+            }
+
+            if(storeElements.contains(s.charAt(index))){
+                continue;
+            }
+
+            while(!store.isEmpty() && store.peek() > s.charAt(index) && frequency.containsKey(store.peek())){
+                storeElements.remove(store.peek());
+                store.pop();
+            }
+
+            if(!storeElements.contains(s.charAt(index))){
+                store.add(s.charAt(index));
+                storeElements.add(s.charAt(index));
+            }
+        }
+
+        String ans = "";
+
+        while(!store.isEmpty()){
+            ans = store.pop()+ans;
+        }
+
+        return ans;
+    }
+}
