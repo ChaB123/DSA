@@ -1,0 +1,55 @@
+LeetCode : https://leetcode.com/problems/simplify-path/description/
+
+Solution #1 : I understand I'm making concatenation of string in below code, which results in O(n^2) time complexity. But, this can be solved easily via StringBuilder. Which is why, I have marked the below code as O(n) time complexity :
+
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public String simplifyPath(String path) {
+        Stack<String> store = new Stack<>();
+
+        String tmp = "";
+
+        for(int i=0;i<path.length();i++){
+            
+            if(path.charAt(i) == '/'){
+                if(tmp.equals("..") && !store.isEmpty()){
+                    store.pop();
+                }
+                
+                if(tmp.equals(".") || tmp.length() == 0 || tmp.equals("..")){
+                    tmp = "";
+                    continue;
+                }
+
+                store.push(tmp);
+                tmp = "";
+            }else{
+                //do we need to push?
+                tmp += path.charAt(i);
+            }
+        }
+
+        if(!store.isEmpty() && tmp.equals("..")){
+            store.pop();
+            tmp = "";
+        }
+
+        if(!tmp.equals(".") && !tmp.equals("..") && tmp.length() > 0){
+            store.push(tmp);
+        }
+
+        if(store.isEmpty()){
+            return "/";
+        }
+
+        String ans = "";
+
+        while(!store.isEmpty()){
+            ans = store.pop()+ans;
+            ans = '/'+ans;
+        }
+
+        return ans;
+    }
+}
