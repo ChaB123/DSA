@@ -1,0 +1,58 @@
+LeetCode : https://leetcode.com/problems/decode-string/description/
+
+Solution #1 :
+Time Complexity : O(k × L), Space Complexity : O(decoded output length)
+
+k = repetition of whole work
+L = decoded substring inside []
+
+class Solution {
+    public String decodeString(String s) {
+        Stack<String> store = new Stack<>();
+
+        StringBuilder ans = new StringBuilder();
+
+        for(int i=0;i<s.length();i++){
+            char current = s.charAt(i);
+
+            if(current == ']'){
+                StringBuilder tmp = new StringBuilder();
+
+                while(!store.peek().equals("[")){
+                    tmp.insert(0, store.pop());
+                }
+
+                // pop '['
+                store.pop();
+
+                int numberOfTimes = Integer.parseInt(store.pop());
+                StringBuilder toAdd = new StringBuilder();
+
+                while(numberOfTimes != 0){
+                    toAdd.append(tmp);
+                    numberOfTimes -= 1;
+                }
+
+                if(!store.isEmpty()){
+                    store.push(toAdd.toString());
+                }else{
+                    ans.append(toAdd);
+                }
+            }else{
+                if(!store.isEmpty() && Character.isDigit(store.peek().charAt(0)) && Character.isDigit(current)){
+                    store.push(store.pop() + current);
+                }else{
+                    store.push(current + "");
+                }
+            }
+        }
+
+        StringBuilder remaining = new StringBuilder();
+
+        while(!store.isEmpty()){
+            remaining.insert(0, store.pop());
+        }
+
+        return ans.toString() + remaining.toString();
+    }
+}
