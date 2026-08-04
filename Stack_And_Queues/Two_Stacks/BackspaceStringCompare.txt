@@ -1,0 +1,152 @@
+LeetCode : https://leetcode.com/problems/backspace-string-compare/description/
+
+Solution #1 :
+Time Complexity : O(s+t), Space Complexity : O(s+t)
+
+class Solution {
+    public boolean backspaceCompare(String s, String t) {
+        Stack<Character> forS = new Stack<>();
+        Stack<Character> forT = new Stack<>();
+
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == '#'){
+                if(!forS.isEmpty()){
+                    forS.pop();
+                }
+            }else{
+                forS.push(s.charAt(i));
+            }
+        }
+
+        for(int i=0;i<t.length();i++){
+            if(t.charAt(i) == '#'){
+                if(!forT.isEmpty()){
+                    forT.pop();
+                }
+            }else{
+                forT.push(t.charAt(i));
+            }
+        }
+
+        String forSString = "";
+        String forTString = "";
+
+        while(!forS.isEmpty()){
+            forSString = forS.pop()+forSString;
+        }
+
+        while(!forT.isEmpty()){
+            forTString = forT.pop()+forTString;
+        }
+
+        if(forSString.equals(forTString)){
+            return true;
+        }
+
+        return false;
+    }
+}
+
+========================================
+
+Solution #2 : without stack
+Time Complexity : O(s+t), Space Complexity : O(s+t)
+
+class Solution {
+    public boolean backspaceCompare(String s, String t) {
+        String forS = "";
+        String forT = "";
+
+        int canWeAddCharacter = 0;
+
+        for(int i=s.length()-1;i>=0;i--){
+            if(s.charAt(i) == '#'){
+                canWeAddCharacter += 1;
+            }else{
+                if(canWeAddCharacter == 0){
+                    forS += s.charAt(i);
+                }else{
+                    canWeAddCharacter -= 1;
+                }
+            }
+        }
+
+        canWeAddCharacter = 0;
+
+        for(int i=t.length()-1;i>=0;i--){
+            if(t.charAt(i) == '#'){
+                canWeAddCharacter += 1;
+            }else{
+                if(canWeAddCharacter == 0){
+                    forT += t.charAt(i);
+                }else{
+                    canWeAddCharacter -= 1;
+                }
+            }
+        }
+
+        if(forS.equals(forT)){
+            return true;
+        }
+
+        return false;
+    }
+}
+
+========================================
+
+Solution #3 : 
+
+Time Complexity : O(s+t), Space Complexity : O(1) :
+
+class Solution {
+    public boolean backspaceCompare(String s, String t) {
+        int lengthOfS = s.length() - 1;
+        int lengthOfT = t.length() - 1;
+
+        int skipS = 0;
+        int skipT = 0;
+
+        while (lengthOfS >= 0 || lengthOfT >= 0) {
+
+            while (lengthOfS >= 0) {
+                if (s.charAt(lengthOfS) == '#') {
+                    skipS += 1;
+                    lengthOfS -= 1;
+                } else if (skipS > 0) {
+                    skipS -= 1;
+                    lengthOfS -= 1;
+                } else {
+                    break;
+                }
+            }
+
+            while (lengthOfT >= 0) {
+                if (t.charAt(lengthOfT) == '#') {
+                    skipT += 1;
+                    lengthOfT -= 1;
+                } else if (skipT > 0) {
+                    skipT -= 1;
+                    lengthOfT -= 1;
+                } else {
+                    break;
+                }
+            }
+
+            if (lengthOfS >= 0 && lengthOfT < 0) {
+                return false;
+            } else if (lengthOfS < 0 && lengthOfT >= 0) {
+                return false;
+            } else if (lengthOfS < 0 && lengthOfT < 0) {
+                return true;
+            } else if (s.charAt(lengthOfS) != t.charAt(lengthOfT)) {
+                return false;
+            }
+
+            lengthOfS -= 1;
+            lengthOfT -= 1;
+        }
+
+        return true;
+    }
+}
