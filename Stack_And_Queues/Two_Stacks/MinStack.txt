@@ -1,0 +1,47 @@
+LeetCode : https://leetcode.com/problems/min-stack/description/
+
+Solution #1 : 
+Time Complexity : For each function : O(1), Space Complexity : O(n) :
+
+class MinStack {
+    Stack<Integer> storeEverything;
+    Stack<Integer> minStack;
+
+    public MinStack() {
+        storeEverything = new Stack<>();
+        minStack = new Stack<>();
+    }
+    
+    public void push(int value) {
+        if(minStack.isEmpty() || minStack.peek() >= value){
+            minStack.push(value);
+        }
+
+        storeEverything.push(value);
+    }
+    
+    public void pop() {
+        if(storeEverything.peek().intValue() == minStack.peek().intValue()){
+            minStack.pop();
+        }
+
+        storeEverything.pop();
+    }
+    
+    public int top() {
+        return storeEverything.peek();
+    }
+    
+    public int getMin() {
+        return minStack.peek();
+    }
+}
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack obj = new MinStack();
+ * obj.push(value);
+ * obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.getMin();
+ */
