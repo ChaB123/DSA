@@ -1,0 +1,91 @@
+LeetCode : https://leetcode.com/problems/design-a-stack-with-increment-operation/description/
+
+Solution #1 :
+Time Complexity : O(k), because of increment() function, Space Complexity : O(n) :
+
+class CustomStack {
+    Stack<Integer> store = new Stack<>();
+    int[] carry;
+    int maxSizeOfStack = 0;
+
+    public CustomStack(int maxSize) {
+        carry = new int[maxSize];
+        maxSizeOfStack = maxSize;
+    }
+    
+    public void push(int x) {
+        if(store.size() >= maxSizeOfStack){
+            //do nothing
+        }else{
+            store.push(x);
+        }
+    }
+    
+    public int pop() {
+        if(store.isEmpty()){
+            return -1;
+        }
+
+        int toAddCarry = carry[store.size()-1];
+        carry[store.size()-1] = 0;
+
+        return toAddCarry+store.pop();
+    }
+    
+    public void increment(int k, int val) {
+        if(k > store.size()){
+            k = store.size();
+        }
+
+        for(int i=0;i<k;i++){
+            carry[i] += val;
+        }
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(1), Space Complexity : O(n) :
+
+class CustomStack {
+    Stack<Integer> store = new Stack<>();
+    int[] carry;
+    int maxSizeOfStack = 0;
+
+    public CustomStack(int maxSize) {
+        carry = new int[maxSize];
+        maxSizeOfStack = maxSize;
+    }
+    
+    public void push(int x) {
+        if(store.size() >= maxSizeOfStack){
+            //do nothing
+        }else{
+            store.push(x);
+            carry[store.size()-1] = 0;
+        }
+    }
+    
+    public int pop() {
+        if(store.isEmpty()){
+            return -1;
+        }
+
+        int index = store.size()-1;
+        int toAddCarry = carry[index];
+
+        if(index > 0){
+            carry[index-1] += carry[index];
+        }
+
+        return toAddCarry+store.pop();
+    }
+    
+    public void increment(int k, int val) {
+        int index = Math.min(k, store.size()) - 1;
+        if(index >= 0){
+            carry[index] += val;
+        }
+    }
+}
