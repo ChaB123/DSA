@@ -1,0 +1,51 @@
+LeetCode : https://leetcode.com/problems/basic-calculator/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int calculate(String s) {
+        Stack<Integer> store = new Stack<>();
+
+        int ans = 0;
+        int currentNumber = 0;
+        int sign = 1;
+
+        store.push(1);
+
+        for(int i=0;i<s.length();i++){
+            char current = s.charAt(i);
+
+            if(current == ' '){
+                continue;
+            }
+
+            if(current >= '0' && current <= '9'){
+                currentNumber = 0;
+
+                while(i < s.length() && s.charAt(i) >= '0' && s.charAt(i) <= '9'){
+                    currentNumber = currentNumber * 10 + (s.charAt(i) - '0');
+                    i++;
+                }
+
+                ans += sign * currentNumber;
+                i--;
+            }else if(current == '+'){
+                sign = store.peek();
+            }else if(current == '-'){
+                sign = -store.peek();
+            }else if(current == '('){
+                store.push(sign);
+            }else{
+                store.pop();
+            }
+        }
+
+        return ans;
+    }
+}
+
+
+Explanation : The key observation in this problem is that since the expression contains only `+`, `-`, and parentheses, there is no operator precedence to worry about. Every number contributes directly to the final answer; the only thing that changes is whether that number should be added or subtracted. Instead of storing the entire expression and evaluating it whenever a closing parenthesis is encountered, I keep track of the **effective sign** that should be applied to the next number. The stack is therefore not used to store numbers, but to store the current sign context created by nested parentheses. Initially, I push `1` onto the stack to represent that we are starting in a positive context. Whenever a `'+'` is encountered, the sign of the next number becomes the current sign context (`store.peek()`), and whenever a `'-'` is encountered, the sign becomes the opposite of the current sign context (`-store.peek()`). When an opening parenthesis `'('` is found, I push the current sign onto the stack because every number inside that parenthesis should follow the same sign context until the matching `')'` is reached. Once a closing parenthesis is encountered, I simply pop the stack to restore the previous sign context.
+
+While traversing the string, whenever a digit is encountered, I don't process it immediately because the number may consist of multiple digits. Instead, I keep reading consecutive digits and construct the complete number using `currentNumber = currentNumber * 10 + (digit)`. This continues until a non-digit character is reached. Once the entire number has been formed, I immediately add its contribution to the answer using `ans += sign * currentNumber`. Since the inner `while` loop advances the index `i` until the first non-digit character, by the time it exits, `i` is already pointing to that next character. However, the outer `for` loop will also increment `i` at the end of the current iteration. If I don't decrement `i` once using `i--`, the outer loop would skip the non-digit character (such as `'+'`, `'-'`, or `')'`) completely. Therefore, `i--` is used only to compensate for the extra increment performed by the `for` loop, ensuring that every character in the expression is processed exactly once. This approach visits each character only once, resulting in **O(n)** time complexity, while the stack stores only the active sign contexts, giving a worst-case **O(n)** space complexity for deeply nested parentheses.
