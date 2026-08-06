@@ -1,0 +1,100 @@
+LeetCode : https://leetcode.com/problems/design-browser-history/description/
+
+Solution #1 : Optimal using Stacks :
+Time Complexity : O(min(steps, size_of_stack)) (this is for back(), forward() function, rest O(1)), Space Complexity : O(number of pages visited yet)
+
+class BrowserHistory {
+    Stack<String> currentPage = new Stack<>();
+    Stack<String> forwardPage = new Stack<>();
+
+    public BrowserHistory(String homepage) {
+        currentPage.push(homepage);
+    }
+    
+    public void visit(String url) {
+        currentPage.push(url);
+        forwardPage = new Stack<>();
+    }
+    
+    public String back(int steps) {
+        if(steps > currentPage.size()-1){
+            steps = currentPage.size()-1;
+        }
+
+        while(steps > 0){
+            forwardPage.push(currentPage.pop());
+            steps -= 1;
+        }
+
+        return currentPage.peek();
+    }
+    
+    public String forward(int steps) {
+        if(forwardPage.isEmpty()){
+            if(!currentPage.isEmpty()){
+                return currentPage.peek();
+            }
+        }
+
+        if(steps > forwardPage.size()){
+            steps = forwardPage.size();
+        }
+
+        while(steps > 0){
+            currentPage.push(forwardPage.pop());
+            steps -= 1;
+        }
+
+        return currentPage.peek();
+    }
+}
+
+========================================
+
+Solution #2 : Using ArrayList, and Two Pointers
+Time Complexity : O(1), (for each function), Space Complexity : O(n) :
+
+class BrowserHistory {
+    List<String> pages = new ArrayList<>();
+    int currentIndex = -1;
+    int lastIndex = -1;
+
+    public BrowserHistory(String homepage) {
+        currentIndex += 1;
+        lastIndex += 1;
+        pages.add(homepage);
+    }
+    
+    public void visit(String url) {
+        currentIndex += 1;
+        lastIndex = currentIndex;
+
+        if(currentIndex == pages.size()){
+            pages.add(url);
+        }else{
+            pages.set(currentIndex, url);
+        }
+    }
+    
+    public String back(int steps) {
+        if(steps > currentIndex){
+            steps = currentIndex;
+        }
+
+        currentIndex = currentIndex - steps;
+
+        return pages.get(currentIndex);
+    }
+    
+    public String forward(int steps) {
+        int currentForwardPagesSize = lastIndex - currentIndex;
+
+        if(steps > currentForwardPagesSize){
+            steps = currentForwardPagesSize;
+        }
+
+        currentIndex = currentIndex + steps;
+
+        return pages.get(currentIndex);
+    }
+}
