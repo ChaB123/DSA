@@ -1,0 +1,90 @@
+LeetCode : https://leetcode.com/problems/design-circular-deque/description/
+
+Solution #1 : 
+Time Complexity : O(1) (for each function), Space Complexity : O(n) :
+
+class MyCircularDeque {
+    int[] store;
+    int head = 0;
+    int capacity = 0;
+    int size = 0;
+
+    public MyCircularDeque(int k) {
+        store = new int[k];
+        size = 0;
+        capacity = k;
+    }
+    
+    public boolean insertFront(int value) {
+        if(size == capacity){
+            return false;
+        }
+
+        head = (head - 1 + capacity) % capacity;
+        store[head] = value;
+        size += 1;
+        return true;
+    }
+    
+    public boolean insertLast(int value) {
+        if(size == capacity){
+            return false;
+        }
+        int rear = (head + size) % capacity;
+        store[rear] = value;
+        size += 1;
+        return true;
+    }
+    
+    public boolean deleteFront() {
+        if (size == 0){
+            return false;
+        }
+
+        head = (head + 1) % capacity;
+        size -= 1;
+        return true;
+    }
+    
+    public boolean deleteLast() {
+        if (size == 0){
+            return false;
+        }
+
+        size -= 1;
+        return true;
+    }
+    
+    public int getFront() {
+        if(size == 0){
+            return -1;
+        }
+
+        return store[head];
+    }
+    
+    public int getRear() {
+        if(size == 0){
+            return -1;
+        }
+
+        int rear = (head + size - 1) % capacity;
+        return store[rear];
+    }
+    
+    public boolean isEmpty() {
+        if(size == 0){
+            return true;
+        }
+
+        return false;
+    }
+    
+    public boolean isFull() {
+        if(size == capacity){
+            return true;
+        }
+
+        return false;
+    }
+}
