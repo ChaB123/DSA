@@ -1,0 +1,49 @@
+LeetCode : https://leetcode.com/problems/sliding-window-maximum/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        Deque<Integer> dq = new ArrayDeque<>();
+        int[] ans = new int[nums.length-k+1];
+        int indexAns = 0;
+
+        int head = 0;
+        while(head < k){
+            if(dq.isEmpty()){
+                dq.add(head);
+            }else{
+                while(!dq.isEmpty() && nums[dq.getLast()] <= nums[head]){
+                    dq.pollLast();
+                }
+
+                dq.addLast(head);
+            }
+
+            head += 1;
+        }
+
+        int tail = 1;
+        ans[indexAns] = nums[dq.getFirst()];
+        indexAns += 1;
+
+        while(head < nums.length){
+            while(!dq.isEmpty() && dq.getFirst() < tail){
+                dq.pollFirst();
+            }
+
+            while(!dq.isEmpty() && nums[dq.getLast()] <= nums[head]){
+                dq.pollLast();
+            }
+
+            dq.addLast(head);
+            ans[indexAns] = nums[dq.getFirst()];
+            indexAns += 1;
+            head += 1;
+            tail += 1;
+        }
+
+        return ans;
+    }
+}
