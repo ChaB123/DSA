@@ -1,0 +1,40 @@
+LeetCode : https://leetcode.com/problems/binary-tree-level-order-traversal-ii/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> ans = new LinkedList();
+
+        if(root == null){
+            return ans;
+        }
+
+        Queue<TreeNode> storeElement = new ArrayDeque<>();
+        storeElement.add(root);
+
+        while(!storeElement.isEmpty()){
+            List<Integer> tmp = new ArrayList<>();
+            int size = storeElement.size();
+
+            for(int i=0;i<size;i++){
+                TreeNode currentElement = storeElement.poll();
+
+                tmp.add(currentElement.val);
+
+                if(currentElement.left != null){
+                    storeElement.add(currentElement.left);
+                }
+
+                if(currentElement.right != null){
+                    storeElement.add(currentElement.right);
+                }
+            }
+
+            ans.addFirst(tmp);
+        }
+
+        return ans;
+    }
+}
