@@ -1,0 +1,83 @@
+LeetCode : https://leetcode.com/problems/max-consecutive-ones-iii/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int longestOnes(int[] nums, int k) {
+        int[] prefixSum = new int[nums.length];
+        prefixSum[0] = nums[0];
+
+        for(int i=1;i<prefixSum.length;i++){
+            prefixSum[i] = prefixSum[i-1] + nums[i];
+        }
+
+        Deque<Integer> dq = new ArrayDeque<>();
+        int ans = 0;
+
+        for(int i=0;i<prefixSum.length;i++){
+
+            dq.addLast(i);
+
+            while(!dq.isEmpty()){
+                int left = dq.getFirst();
+
+                int zeros;
+
+                if(nums[left] == 0){
+                    zeros = (i-left) - (prefixSum[i]-prefixSum[left]) + 1;
+                }else{
+                    zeros = (i-left) - (prefixSum[i]-prefixSum[left]);
+                }
+
+                if(zeros <= k){
+                    break;
+                }
+
+                dq.pollFirst();
+            }
+
+            if(!dq.isEmpty()){
+                ans = Math.max(ans, i-dq.getFirst()+1);
+            }
+        }
+
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public int longestOnes(int[] nums, int k) {
+        int maxNumberOfZero = 0;
+        int high = 0;
+        int low = 0;
+        int ans = 0;
+
+        while(high < nums.length){
+            if(nums[high] == 0){
+                maxNumberOfZero += 1;
+            }
+
+            while(maxNumberOfZero > k && low < high){
+                if(nums[low] == 0){
+                    maxNumberOfZero -= 1;
+                }
+
+                low += 1;
+            }
+
+            if(maxNumberOfZero <= k){
+                ans = Math.max(ans, high-low+1);
+            }
+
+            high += 1;
+        }
+
+        return ans;
+    }
+}
