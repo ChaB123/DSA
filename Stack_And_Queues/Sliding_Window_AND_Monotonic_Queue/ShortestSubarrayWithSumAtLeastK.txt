@@ -1,0 +1,171 @@
+LeetCode : https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int shortestSubarray(int[] nums, int k) {
+        int[] prefixSum = new int[nums.length+1];
+        prefixSum[0] = 0;
+
+        for(int i=1;i<prefixSum.length;i++){
+            prefixSum[i] = prefixSum[i-1]+nums[i-1];
+        }
+
+        int ans = Integer.MAX_VALUE;
+        Deque<Integer> dq = new ArrayDeque<>();
+
+        for(int i=0;i<prefixSum.length;i++){
+            while(!dq.isEmpty() && prefixSum[i]-prefixSum[dq.getFirst()] >= k){
+                ans = Math.min(ans, i-dq.getFirst());
+                dq.pollFirst();
+            }
+                
+            while(!dq.isEmpty() && prefixSum[i] <= prefixSum[dq.getLast()]){
+                dq.pollLast();
+            }
+            
+            dq.addLast(i);
+        }
+
+        if(ans == Integer.MAX_VALUE){
+            return -1;
+        }
+
+        return ans;
+    }
+}
+
+========================================
+Explanation :
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When I first look at the problem, I see that I need to find a **subarray with sum at least `k`**, and among all such subarrays I need the shortest one.
+
+My first thought is a normal sliding window. If all the numbers were positive, that would work because when I expand the window, the sum can only increase, and when I remove something from the left, the sum can only decrease. So I could keep expanding until I reach `k`, and then keep shrinking the window to find the shortest answer.
+
+But here the array can contain negative numbers. That breaks the normal sliding-window logic. For example, if I remove a negative number from the left, my sum actually increases. So I can no longer reliably decide whether I should move the left pointer or the right pointer based on the current sum.
+
+At this point, instead of looking at the current window sum, I can think about how to calculate the sum of **any subarray** efficiently.
+
+For that, I can use prefix sums.
+
+If I define:
+
+```text
+prefix[i] = sum of nums[0 ... i-1]
+```
+
+then the sum of a subarray from `j` to `i-1` is:
+
+```text
+prefix[i] - prefix[j]
+```
+
+So the condition from the problem:
+
+```text
+subarray sum >= k
+```
+
+becomes:
+
+```text
+prefix[i] - prefix[j] >= k
+```
+
+or:
+
+```text
+prefix[j] <= prefix[i] - k
+```
+
+Now the problem becomes:
+
+> For every `prefix[i]`, I need to find an earlier prefix sum `prefix[j]` that is small enough, and I want the largest possible `j` because that gives me the shortest subarray.
+
+This is where I start thinking about what information I actually need to keep.
+
+Suppose I have two previous prefix sums:
+
+```text
+index 1 -> prefix = 5
+index 2 -> prefix = 1
+```
+
+The second one is at a later index and also has a smaller prefix sum.
+
+That means index `2` completely dominates index `1`.
+
+Why?
+
+For any future prefix sum `X`:
+
+```text
+X - 1 > X - 5
+```
+
+So the prefix `1` will always give me a sum at least as large as the prefix `5`.
+
+And because index `2` is later than index `1`, it will also give me a shorter subarray.
+
+Since the problem only requires the sum to be **at least** `k`, there is no disadvantage to getting a larger sum.
+
+Therefore, once I encounter a smaller prefix sum at a later index, I can discard the larger prefix sum from the deque because it can never produce a better answer in the future.
+
+This tells me that I want to maintain the prefix sums in **increasing order**.
+
+That's where the monotonic deque comes from.
+
+For every new prefix sum, I do two things.
+
+First, I check the front of the deque. If:
+
+```text
+prefix[i] - prefix[dq.front] >= k
+```
+
+then I have found a valid subarray.
+
+Its length is:
+
+```text
+i - dq.front
+```
+
+I update my answer and remove that index from the front.
+
+I can remove it because I've already found a valid subarray using that starting point, and any future `i` will only make the subarray longer.
+
+Second, I check the back of the deque. If:
+
+```text
+prefix[i] <= prefix[dq.back]
+```
+
+then the prefix at the back is useless, because the current prefix is both smaller and at a later index. So I remove it.
+
+Finally, I add the current prefix index to the deque.
+
+So the overall idea is:
+
+```text
+Prefix Sum
+    ↓
+Convert subarray sum into:
+prefix[i] - prefix[j] >= k
+    ↓
+Need an earlier prefix sum <= prefix[i] - k
+    ↓
+Keep only useful starting points
+    ↓
+Remove dominated prefix sums from the back
+    ↓
+Use the front to find valid shortest subarrays
+    ↓
+Monotonic Deque
+```
+
+The important intuition for me is that I am **not trying to decide whether each negative number should be included or excluded**.
+
+Instead, prefix sums let me consider all possible subarray boundaries, and the monotonic deque lets me throw away boundaries that can never produce a better answer.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
