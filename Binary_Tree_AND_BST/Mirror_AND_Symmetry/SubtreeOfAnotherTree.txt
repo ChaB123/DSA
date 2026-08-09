@@ -1,0 +1,96 @@
+LeetCode : https://leetcode.com/problems/subtree-of-another-tree/description/
+
+Solution #1 : 
+Time Complexity : O(n*m) (n = size of root tree, m = size of sub root tree), Space Complexity : O(n) :
+
+class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if(root == null && subRoot == null){
+            return true;
+        }else if(root != null && subRoot == null){
+            return true;
+        }else if(root == null && subRoot != null){
+            return false;
+        }
+
+        Queue<TreeNode> dq = new ArrayDeque();
+        dq.add(root);
+
+        while(!dq.isEmpty()){
+            int size = dq.size();
+
+            for(int i=0;i<size;i++){
+                TreeNode currentElement = dq.poll();
+
+                if(currentElement.val == subRoot.val){
+                    if(sameTree(currentElement, subRoot)){
+                        return true;
+                    }
+                }
+
+                if(currentElement.left != null){
+                    dq.add(currentElement.left);
+                }
+
+                if(currentElement.right != null){
+                    dq.add(currentElement.right);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean sameTree(TreeNode p, TreeNode q){
+        if(p == null && q == null){
+            return true;
+        }else if(p == null && q != null){
+            return false;
+        }else if(p != null && q == null){
+            return false;
+        }
+
+        if(p.val != q.val){
+            return false;
+        }
+
+        return sameTree(p.left, q.left) && sameTree(p.right, q.right);
+    }
+}
+
+========================================
+
+Solution #2 : Eliminating BFS queue :
+Time Complexity : O(n*m), Space Complexity : O(n) :
+
+class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if(subRoot == null){
+            return true;
+        }
+
+        if(root == null){
+            return false;
+        }
+
+        if(sameTree(root, subRoot)){
+            return true;
+        }
+
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+
+    public boolean sameTree(TreeNode p, TreeNode q){
+        if(p == null && q == null){
+            return true;
+        }else if(p == null || q == null){
+            return false;
+        }
+
+        if(p.val != q.val){
+            return false;
+        }
+
+        return sameTree(p.left, q.left) && sameTree(p.right, q.right);
+    }
+}

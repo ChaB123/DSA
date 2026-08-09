@@ -1,0 +1,53 @@
+LeetCode : https://leetcode.com/problems/flip-equivalent-binary-trees/description/
+
+Solution #1 : 
+Time Complexity : O(n^2), Space Complexity : O(h), where h is the height of the tree; O(n) worst case for a skewed tree and O(log n) for a balanced tree. :
+
+class Solution {
+    public boolean flipEquiv(TreeNode root1, TreeNode root2) {
+        if(root1 == null || root2 == null){
+            return root1 == root2;
+        }
+
+        if(root1.left == null && root1.right == null && (root2.left != null || root2.right != null)){
+            return false;
+        }
+
+        if(root2.left == null && root2.right == null && (root1.left != null || root1.right != null)){
+            return false;
+        }
+
+        if(root1.val != root2.val){
+            return false;
+        }
+
+        if(!(flipEquiv(root1.left, root2.left) || flipEquiv(root1.left, root2.right))){
+            return false;
+        }
+
+        if(!(flipEquiv(root1.right, root2.right) || flipEquiv(root1.right, root2.left))){
+            return false;
+        }
+
+        return true;
+    }
+}
+
+========================================
+
+Solution #2 : More Cleaner Code :
+Time Complexity : O(n^2), Space Complexity : O(h), where h is the height of the tree; O(n) worst case for a skewed tree and O(log n) for a balanced tree :
+
+class Solution {
+    public boolean flipEquiv(TreeNode root1, TreeNode root2) {
+        if(root1 == null || root2 == null){
+            return root1 == root2;
+        }
+
+        if(root1.val != root2.val){
+            return false;
+        }
+
+        return (flipEquiv(root1.left, root2.left) && flipEquiv(root1.right, root2.right)) || (flipEquiv(root1.left, root2.right) && flipEquiv(root1.right, root2.left));
+    }
+}

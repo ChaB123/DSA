@@ -1,0 +1,21 @@
+LeetCode : https://leetcode.com/problems/invert-binary-tree/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(n) 
+
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if(root == null){
+            return root;
+        }
+
+        TreeNode left = root.left;
+        root.left = root.right;
+        root.right = left;
+
+        invertTree(root.left);
+        invertTree(root.right);
+        
+        return root;
+    }
+}
