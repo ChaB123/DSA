@@ -1,0 +1,91 @@
+LeetCode : https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/description/
+
+Solution #1 : By calculating the path from node back to root, and the comparing
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        List<TreeNode> pToRootPath = rootToNodePath(root, p);
+        List<TreeNode> qToRootPath = rootToNodePath(root, q);
+
+        int indexP = pToRootPath.size()-1;
+        int indexQ = qToRootPath.size()-1;
+
+        TreeNode ans = pToRootPath.get(pToRootPath.size()-1);
+
+        while(indexP >= 0 && indexQ >= 0){
+            if(pToRootPath.get(indexP).val == qToRootPath.get(indexQ).val){
+                ans = pToRootPath.get(indexP);
+                indexP -= 1;
+                indexQ -= 1;
+            }else{
+                break;
+            }
+        }
+
+        return ans;
+    }
+
+    
+    public List<TreeNode> rootToNodePath(TreeNode root, TreeNode p){
+        List<TreeNode> ans = new ArrayList<>();
+
+        if(root == null){
+            return ans;
+        }
+
+        if(root == p){
+            ans.add(root);
+            return ans;
+        }
+
+        List<TreeNode> leftDirection = rootToNodePath(root.left, p);
+
+        if(!leftDirection.isEmpty()){
+            leftDirection.add(root);
+            return leftDirection;
+        }
+
+        List<TreeNode> rightDirection = rootToNodePath(root.right, p);
+
+        if(!rightDirection.isEmpty()){
+            rightDirection.add(root);
+            return rightDirection;
+        }
+
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 : More cleaner code/approach. We do not need to calculate whole path back to root.
+
+Idea : For every node, I recursively search its left and right subtree. If the left subtree returns something, it means one of my target nodes was found somewhere on the left. Similarly, if the right subtree returns something, it means one of the targets was found on the right. So if both left and right return a node, that means one target is present on each side. Therefore, the current node must be the Lowest Common Ancestor. If only one side returns a node, I just pass that node upward because both targets must be somewhere in that same subtree, or I have already found one of the targets. So instead of explicitly storing the entire paths, I'm basically carrying the information I need back through the recursion.
+
+Time Complexity : O(n), Space Compelxity : O(h) :
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root == null){
+            return root;
+        }
+
+        if(root.val == p.val || root.val == q.val){
+            return root;
+        }
+
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+
+        if(left != null & right != null){
+            return root;
+        }
+
+        if(left != null){
+            return left;
+        }
+
+        return right;
+    }
+}

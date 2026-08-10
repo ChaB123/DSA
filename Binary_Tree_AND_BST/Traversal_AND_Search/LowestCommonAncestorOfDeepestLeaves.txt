@@ -1,0 +1,103 @@
+LeetCode : https://leetcode.com/problems/lowest-common-ancestor-of-deepest-leaves/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    public TreeNode lcaDeepestLeaves(TreeNode root) {
+        if(root.left == null && root.right == null){
+            return root;
+        }
+
+        int maxDepth = findDepth(root);
+        return LCAOfDeepestDepth(root, maxDepth-1);
+    }
+
+    public int findDepth(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+
+        int leftDepth = findDepth(root.left);
+        int rightDepth = findDepth(root.right);
+
+        if(leftDepth > rightDepth){
+            return leftDepth+1;
+        }
+
+        return rightDepth+1;
+    }
+
+    public TreeNode LCAOfDeepestDepth(TreeNode root, int depth){
+        if(root == null){
+            return root;
+        }
+
+        if(depth == 0){
+            return root;
+        }
+
+        TreeNode leftSubTree = LCAOfDeepestDepth(root.left, depth-1);
+        TreeNode rightSubTree = LCAOfDeepestDepth(root.right, depth-1);
+
+        if(leftSubTree != null && rightSubTree != null){
+            return root;
+        }
+
+        if(leftSubTree != null && rightSubTree == null){
+            return leftSubTree;
+        }
+
+        if(leftSubTree == null && rightSubTree != null){
+            return rightSubTree;
+        }
+
+        return null;
+    }
+}
+
+========================================
+
+Solution #2 : The above code takes two pass to calculate the result. Below is single pass solution but AI generated.
+Time Complexity : O(n), Space Complexity : O(h)
+
+Idea : Instead of calculating the maximum depth globally first, I can calculate the maximum depth of each subtree while returning from recursion. At each node, I compare the deepest depth from the left and right. If they're equal, the current node is the LCA; otherwise I propagate the result from the deeper side.
+
+class Solution {
+    public TreeNode lcaDeepestLeaves(TreeNode root) {
+        return findLCA(root).node;
+    }
+
+    public Result findLCA(TreeNode root) {
+        if(root == null){
+            return new Result(null, 0);
+        }
+
+        if(root.left == null && root.right == null){
+            return new Result(root, 1);
+        }
+
+        Result leftResult = findLCA(root.left);
+        Result rightResult = findLCA(root.right);
+
+        if(leftResult.depth == rightResult.depth){
+            return new Result(root, leftResult.depth + 1);
+        }
+
+        if(leftResult.depth > rightResult.depth){
+            return new Result(leftResult.node, leftResult.depth + 1);
+        }
+
+        return new Result(rightResult.node, rightResult.depth + 1);
+    }
+
+    class Result {
+        TreeNode node;
+        int depth;
+
+        Result(TreeNode node, int depth){
+            this.node = node;
+            this.depth = depth;
+        }
+    }
+}

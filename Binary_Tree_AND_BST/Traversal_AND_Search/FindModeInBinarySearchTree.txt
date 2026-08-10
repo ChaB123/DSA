@@ -1,0 +1,218 @@
+LeetCode : https://leetcode.com/problems/find-mode-in-binary-search-tree/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int[] findMode(TreeNode root) {
+        if(root.left == null && root.right == null){
+            int[] ans = new int[1];
+            ans[0] = root.val;
+            return ans;
+        }
+
+        Queue<TreeNode> dq = new ArrayDeque<>();
+        HashMap<Integer, Integer> frequency = new HashMap<>();
+        dq.add(root);
+
+        while(!dq.isEmpty()){
+            int size = dq.size();
+
+            for(int i=0;i<size;i++){
+                TreeNode current = dq.poll();
+
+                if(frequency.containsKey(current.val)){
+                    frequency.put(current.val, frequency.get(current.val)+1);
+                }else{
+                    frequency.put(current.val, 1);
+                }
+
+                if(current.left != null){
+                    dq.add(current.left);
+                }
+
+                if(current.right != null){
+                    dq.add(current.right);
+                }
+            }
+        }
+
+        int maxFrequency = 0;
+        for(int k : frequency.keySet()){
+            maxFrequency = Math.max(maxFrequency, frequency.get(k));
+        }
+
+        List<Integer> tmpAns = new ArrayList<>();
+        for(int k : frequency.keySet()){
+            if(maxFrequency == frequency.get(k)){
+                tmpAns.add(k);
+            }
+        }
+
+        int[] ans = new int[tmpAns.size()];
+        for(int i=0;i<tmpAns.size();i++){
+            ans[i] = tmpAns.get(i);
+        }
+
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(n) (if we consider recursion stack space, but in follow-up it was written to consider this stack space as O(1). So find space complexity : O(1)) :
+
+class Solution {
+    Integer previousValue = null;
+    int maxFrequencyValue = 0;
+    int currentFrequency = 0;
+    List<Integer> tmpAns = new ArrayList<>();
+    public int[] findMode(TreeNode root) {
+        //find maximum frequency
+        maxFrequency(root);
+
+        //reset every value 
+        previousValue = null;
+        currentFrequency = 0;
+
+        //populate tmpAns
+        findElements(root);
+
+        //transform List<Integer> to int[]
+        int[] ans = new int[tmpAns.size()];
+        for(int i=0;i<tmpAns.size();i++){
+            ans[i] = tmpAns.get(i);
+        }
+
+        return ans;
+    }
+
+    public void maxFrequency(TreeNode root){
+        if(root == null){
+            return;
+        }
+
+        maxFrequency(root.left);
+
+        if(previousValue != null && previousValue == root.val){
+            currentFrequency += 1;
+        }else{
+            currentFrequency = 1;
+        }
+
+        maxFrequencyValue = Math.max(maxFrequencyValue, currentFrequency);
+        previousValue = root.val;
+
+        maxFrequency(root.right);
+    }
+
+    public void findElements(TreeNode root){
+        if(root == null){
+            return;
+        }
+
+        findElements(root.left);
+
+        if(previousValue != null && previousValue == root.val){
+            currentFrequency += 1;
+        }else{
+            currentFrequency = 1;
+        }
+
+        if(currentFrequency == maxFrequencyValue){
+            tmpAns.add(root.val);
+        }
+
+        previousValue = root.val;
+
+        findElements(root.right);
+    }
+}
+
+========================================
+
+Solution #3 : Morris traversal
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int[] findMode(TreeNode root) {
+        TreeNode current = root;
+        List<Integer> ans = new ArrayList<>();
+
+        int maxFrequency = 0;
+        int currentFrequency = 0;
+        Integer previousValue = null;
+
+        while(current != null){
+            if(current.left == null){
+                //System.out.println("Line 23 : "+current.val);
+                ans.add(current.val);
+
+                if(previousValue != null && previousValue == current.val){
+                    currentFrequency += 1;
+                }else{
+                    currentFrequency = 1;
+                }
+
+                maxFrequency = Math.max(maxFrequency, currentFrequency);
+                previousValue = current.val;
+
+                current = current.right;
+            }else{
+                //find inorder predecessor
+                TreeNode IP = current.left;
+                while(IP.right != null && IP.right != current){
+                    IP = IP.right;
+                }
+
+                //create thread
+                if(IP.right == null){
+                    IP.right = current;
+                    current = current.left;
+                }else{
+                    //delete thread
+                    IP.right = null;
+                    // inorder element
+                    //System.out.println("Line 38 : "+current.val);
+                    ans.add(current.val);
+
+                    if(previousValue != null && previousValue == current.val){
+                        currentFrequency += 1;
+                    }else{
+                        currentFrequency = 1;
+                    }
+
+                    maxFrequency = Math.max(maxFrequency, currentFrequency);
+                    previousValue = current.val;
+
+                    current = current.right;
+                }
+            }
+        }
+
+        List<Integer> tmpAns = new ArrayList<>();
+        previousValue = null;
+
+        for(int i=0;i<ans.size();i++){
+            if(previousValue != null && previousValue.equals(ans.get(i))){
+                currentFrequency += 1;
+            }else{
+                currentFrequency = 1;
+            }
+
+            if(currentFrequency == maxFrequency){
+                tmpAns.add(ans.get(i));
+            }
+            
+            previousValue = ans.get(i);
+        }
+
+        int[] finalAns = new int[tmpAns.size()];
+        for(int i=0;i<finalAns.length;i++){
+            finalAns[i] = tmpAns.get(i);
+        }
+
+        return finalAns;
+    }
+}

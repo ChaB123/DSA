@@ -1,0 +1,49 @@
+LeetCode : https://leetcode.com/problems/kth-smallest-element-in-a-bst/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    List<Integer> tmp = new ArrayList<>();
+    public int kthSmallest(TreeNode root, int k) {
+        Inorder(root);
+        return tmp.get(k-1);
+    }
+    public void Inorder(TreeNode root){
+        if(root == null){
+            return;
+        }
+
+        Inorder(root.left);
+        tmp.add(root.val);
+        Inorder(root.right);
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    int position = 1;
+    public int kthSmallest(TreeNode root, int k) {
+        if(root == null){
+            return -1;
+        }
+
+        int leftVal = kthSmallest(root.left, k);
+
+        if(leftVal > -1){
+            return leftVal;
+        }
+
+        if(position == k){
+            return root.val;
+        }else{
+            position += 1;
+        }
+
+        return kthSmallest(root.right, k);
+    }
+}

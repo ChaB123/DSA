@@ -1,0 +1,62 @@
+LeetCode : https://leetcode.com/problems/two-sum-iv-input-is-a-bst/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    List<Integer> tmp = new ArrayList<>();
+    public boolean findTarget(TreeNode root, int k) {
+        if(root == null){
+            return false;
+        }
+
+        InOrder(root);
+        //System.out.println(tmp);
+
+        HashSet<Integer> find = new HashSet<>();
+        for(int i=0;i<tmp.size();i++){
+            if(find.contains(tmp.get(i))){
+                return true;
+            }else{
+                find.add(k - tmp.get(i));
+            }
+        }
+
+        return false;
+    }
+    public void InOrder(TreeNode root){
+        if(root == null){
+            return;
+        }
+
+        InOrder(root.left);
+        tmp.add(root.val);
+        InOrder(root.right);
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    HashSet<Integer> find = new HashSet<>();
+    public boolean findTarget(TreeNode root, int k) {
+        if(root == null){
+            return false;
+        }
+
+        if(findTarget(root.left, k)){
+            return true;
+        }
+
+        if(find.contains(root.val)){
+            return true;
+        }else{
+            find.add(k - root.val);
+        }
+
+        return findTarget(root.right, k);
+    }
+}

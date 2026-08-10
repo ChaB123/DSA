@@ -1,0 +1,55 @@
+LeetCode : https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/description/
+
+Solution #1 : 
+Time Complexity : O(h), Space Complexity : O(h) :
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root == null){
+            return root;
+        }
+
+        //if root == p || root == q then return root
+        if(root.val == p.val || root.val == q.val){
+            return root;
+        }
+
+        //if both node are in different branch, i.e : left, right : then return root
+        if((p.val < root.val && q.val > root.val) || (p.val > root.val && q.val < root.val)){
+            return root;
+        }
+
+        //if both node are in left branch, then we need further search in left branch
+        if(p.val < root.val && q.val < root.val){
+            return lowestCommonAncestor(root.left, p, q);
+        }
+        
+        //if both node are in right branch, then we need further search in right branch
+        return lowestCommonAncestor(root.right, p, q);
+    }
+}
+
+========================================
+
+Solution #2 : Making above code more cleaner :
+Time Complexity : O(h), Space Complexity : O(h) :
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root == null){
+            return root;
+        }
+
+        //if both node are in left branch, then we need further search in left branch
+        if(p.val < root.val && q.val < root.val){
+            return lowestCommonAncestor(root.left, p, q);
+        }
+
+        //if both node are in right branch, then we need further search in right branch
+        if(p.val > root.val && q.val > root.val){
+            return lowestCommonAncestor(root.right, p, q);
+        }
+        
+        return root;
+    }
+}
