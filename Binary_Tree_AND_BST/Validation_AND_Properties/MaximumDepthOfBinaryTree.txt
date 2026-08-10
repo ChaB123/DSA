@@ -1,0 +1,17 @@
+LeetCode : https://leetcode.com/problems/maximum-depth-of-binary-tree/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if(root == null){
+            return 0;
+        }
+
+        int leftValue = maxDepth(root.left);
+        int rightValue = maxDepth(root.right);
+
+        return Math.max(leftValue, rightValue)+1;
+    }
+}
