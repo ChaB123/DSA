@@ -1,0 +1,68 @@
+LeetCode : https://leetcode.com/problems/diameter-of-binary-tree/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    int maxVal = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        int ok = test(root);
+        return maxVal;
+    }
+
+    public int test(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+
+        //result is in left subtree
+        int maxLeftValue = 0;
+        if(root.right == null){
+            maxLeftValue = test(root.left);
+            maxVal = Math.max(maxVal, maxLeftValue);
+            return maxLeftValue+1;
+        }
+
+        //result is in right subtree
+        int maxRightValue = 0;
+        if(root.left == null){
+            maxRightValue = test(root.right);
+            maxVal = Math.max(maxVal, maxRightValue);
+            return maxRightValue+1;
+        }
+
+        //result can pass through root
+        if(root.left != null && root.right != null){
+            maxLeftValue = test(root.left);
+            maxRightValue = test(root.right);
+            maxVal = Math.max(maxVal, maxLeftValue + maxRightValue);
+        }
+        
+        return Math.max(maxLeftValue, maxRightValue)+1;
+    }
+}
+
+========================================
+
+Solution #2 : More cleaner code :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    int maxVal = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        findDiameter(root);
+        return maxVal;
+    }
+
+    public int findDiameter(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+
+        int maxLeftValue = findDiameter(root.left);
+        int maxRightValue = findDiameter(root.right);
+        maxVal = Math.max(maxVal, maxLeftValue + maxRightValue);
+        
+        return Math.max(maxLeftValue, maxRightValue)+1;
+    }
+}

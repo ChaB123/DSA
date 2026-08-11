@@ -1,0 +1,90 @@
+LeetCode : https://leetcode.com/problems/check-completeness-of-a-binary-tree/description/
+
+Solution #1 : 
+Time Complexity : O(n), Space Complexity : O(h > w ? h : w) (h = height, w = width of the tree) :
+
+class Solution {
+    public boolean isCompleteTree(TreeNode root) {
+        int maxDepthValue = maxDepth(root);
+
+        Queue<TreeNode> dq = new ArrayDeque<>();
+        dq.add(root);
+        int currentDepth = 1;
+
+        while(!dq.isEmpty()){
+            int size = dq.size();
+            if(currentDepth < maxDepthValue && size != Math.pow(2, currentDepth-1)){
+
+                return false;
+            }
+
+            boolean nowNoFurtherElementShouldCome = false;
+            for(int i=0;i<size;i++){
+                TreeNode currentElement = dq.poll();
+
+                if(currentElement.left != null){
+                    if(currentDepth == maxDepthValue-1 && nowNoFurtherElementShouldCome){
+                        return false;
+                    }
+                    dq.add(currentElement.left);
+                }else{
+                    nowNoFurtherElementShouldCome = true;
+                }
+
+                if(currentElement.right != null){
+                    if(currentDepth == maxDepthValue-1 && nowNoFurtherElementShouldCome){
+                        return false;
+                    }
+                    dq.add(currentElement.right);
+                }else{
+                    nowNoFurtherElementShouldCome = true;
+                }
+            }
+
+            currentDepth += 1;
+        }
+
+        return true;
+    }
+    public int maxDepth(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+
+        int leftDepth = maxDepth(root.left);
+        int rightDepth = maxDepth(root.right);
+
+        return Math.max(leftDepth, rightDepth) + 1;
+    }
+}
+
+========================================
+
+Solution #2 : One pass solution
+Time Complexity : O(n), Space Complexity : O(w) :
+
+class Solution {
+    public boolean isCompleteTree(TreeNode root) {
+        Queue<TreeNode> dq = new LinkedList<>();
+        dq.add(root);
+        boolean nowNoFurtherElementShouldCome = false;
+
+        while(!dq.isEmpty()){
+            TreeNode currentElement = dq.poll();
+
+            if(currentElement == null){
+                nowNoFurtherElementShouldCome = true;
+                continue;
+            }
+
+            if(nowNoFurtherElementShouldCome){
+                return false;
+            }
+            
+            dq.add(currentElement.left);
+            dq.add(currentElement.right);
+        }
+
+        return true;
+    }
+}
