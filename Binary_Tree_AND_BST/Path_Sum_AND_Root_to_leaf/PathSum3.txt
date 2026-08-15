@@ -1,0 +1,129 @@
+LeetCode : https://leetcode.com/problems/path-sum-iii/description/
+
+Solution #1 :
+Time Complexity : O(n^2), Space Complexity : O(h) :
+
+class Solution {
+
+    public int pathSum(TreeNode root, int targetSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        int ans = 0;
+
+        // Start a new path from this node
+        ans += allPossiblePathSum(root, (long) targetSum);
+
+        // Try every node as a possible starting point
+        ans += pathSum(root.left, targetSum);
+        ans += pathSum(root.right, targetSum);
+
+        return ans;
+    }
+
+    public int allPossiblePathSum(TreeNode root, long targetSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        int ans = 0;
+
+        if (root.val == targetSum) {
+            ans++;
+        }
+
+        // Continue the existing path
+        ans += allPossiblePathSum(root.left, targetSum - root.val);
+        ans += allPossiblePathSum(root.right, targetSum - root.val);
+
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    int ans = 0;
+    
+    public int pathSum(TreeNode root, int targetSum) {
+        HashMap<Long, Integer> prefixSum = new HashMap<>();
+        prefixSum.put(0L, 1);
+        allPossiblePathSum(root, targetSum, 0L, prefixSum);
+        return ans;
+    }
+
+    public void allPossiblePathSum(TreeNode root, int targetSum, long prefixSumAll, HashMap<Long, Integer> prefixSum) {
+        if (root == null) {
+            return;
+        }
+
+        long currentPrefixSum = prefixSumAll + (long) root.val;
+
+        if (prefixSum.containsKey(currentPrefixSum - targetSum)) {
+            ans += prefixSum.get(currentPrefixSum - targetSum);
+        }
+
+        if (prefixSum.containsKey(currentPrefixSum)) {
+            prefixSum.put(currentPrefixSum, prefixSum.get(currentPrefixSum) + 1);
+        } else {
+            prefixSum.put(currentPrefixSum, 1);
+        }
+
+        allPossiblePathSum(root.left, targetSum, currentPrefixSum, prefixSum);
+        allPossiblePathSum(root.right, targetSum, currentPrefixSum, prefixSum);
+
+        if(prefixSum.get(currentPrefixSum) > 1){
+            prefixSum.put(currentPrefixSum, prefixSum.get(currentPrefixSum)-1);
+        }else{
+            prefixSum.remove(currentPrefixSum);
+        }
+    }
+}
+
+========================================
+
+Solution #3 : More cleaner code :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    public int pathSum(TreeNode root, int targetSum) {
+        HashMap<Long, Integer> prefixSum = new HashMap<>();
+        prefixSum.put(0L, 1);
+
+        return allPossiblePathSum(root, targetSum, 0L, prefixSum);
+    }
+
+    public int allPossiblePathSum(TreeNode root, int targetSum, long prefixSumAll, HashMap<Long, Integer> prefixSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        long currentPrefixSum = prefixSumAll + (long) root.val;
+        int ans = 0;
+
+        if (prefixSum.containsKey(currentPrefixSum - targetSum)) {
+            ans += prefixSum.get(currentPrefixSum - targetSum);
+        }
+
+        if (prefixSum.containsKey(currentPrefixSum)) {
+            prefixSum.put(currentPrefixSum, prefixSum.get(currentPrefixSum) + 1);
+        } else {
+            prefixSum.put(currentPrefixSum, 1);
+        }
+
+        ans += allPossiblePathSum(root.left, targetSum, currentPrefixSum, prefixSum);
+        ans += allPossiblePathSum(root.right, targetSum, currentPrefixSum, prefixSum);
+
+        if(prefixSum.get(currentPrefixSum) > 1){
+            prefixSum.put(currentPrefixSum, prefixSum.get(currentPrefixSum)-1);
+        }else{
+            prefixSum.remove(currentPrefixSum);
+        }
+
+        return ans;
+    }
+}

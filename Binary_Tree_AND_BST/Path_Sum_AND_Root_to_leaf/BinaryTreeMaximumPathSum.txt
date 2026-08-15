@@ -1,0 +1,62 @@
+LeetCode : https://leetcode.com/problems/binary-tree-maximum-path-sum/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    int maxVal = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        int returnValue = findMaxSum(root);
+        return Math.max(maxVal, returnValue);
+    }
+    public int findMaxSum(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+
+        maxVal = Math.max(maxVal, root.val);
+
+        if(root.left == null && root.right == null){
+            return root.val;
+        }
+
+        int maxLeftValue = findMaxSum(root.left);
+        int maxRightValue = findMaxSum(root.right);
+
+        maxVal = Math.max(maxVal, maxLeftValue + maxRightValue + root.val);
+
+        int returnMax = maxLeftValue + root.val;
+        returnMax = Math.max(returnMax, maxRightValue + root.val);
+        returnMax = Math.max(returnMax, root.val);
+        maxVal = Math.max(maxVal, returnMax);
+        
+        return returnMax;
+    }
+}
+
+========================================
+
+Solution #2 : More cleaner code :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    int maxVal = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        findMaxSum(root);
+        return maxVal;
+    }
+    public int findMaxSum(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+
+        int leftSubTree = Math.max(0, findMaxSum(root.left));
+        int rightSubTree = Math.max(0, findMaxSum(root.right));
+
+        // Best path passing through current node
+        maxVal = Math.max(maxVal, leftSubTree+rightSubTree+root.val);
+
+        // Best path that can be extended to parent
+        return Math.max(leftSubTree, rightSubTree)+root.val;
+    }
+}

@@ -1,0 +1,54 @@
+LeetCode : https://leetcode.com/problems/sum-root-to-leaf-numbers/description/
+
+Solution #1 :
+Time Complexity : O(n^2) (string concatenation take O(depth) at every node), Space Complexity : O(n^2+h) (because string created along the path, h = recursion stack)
+
+class Solution {
+    int sum = 0;
+    public int sumNumbers(TreeNode root) {
+        findSumOfAllRootToLeaf(root, "");
+        return sum;
+    }
+    public void findSumOfAllRootToLeaf(TreeNode root, String currentSum){
+        if(root == null){
+            return;
+        }
+
+        currentSum += root.val;
+
+        if(root.left == null && root.right == null){
+            sum += Integer.parseInt(currentSum);
+            return;
+        }
+
+        findSumOfAllRootToLeaf(root.left, currentSum);
+        findSumOfAllRootToLeaf(root.right, currentSum);
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    public int sumNumbers(TreeNode root) {
+        return findSumOfAllRootToLeaf(root, 0);
+    }
+    public int findSumOfAllRootToLeaf(TreeNode root, int currentSum){
+        if(root == null){
+            return 0;
+        }
+
+        currentSum = currentSum*10+root.val;
+        int sum = 0;
+
+        if(root.left == null && root.right == null){
+            sum += currentSum;
+            return sum;
+        }
+
+        //we didn't added root.val here because it is already added and passed
+        return findSumOfAllRootToLeaf(root.left, currentSum) + findSumOfAllRootToLeaf(root.right, currentSum);
+    }
+}
