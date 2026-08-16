@@ -1,0 +1,31 @@
+LeetCode : https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/description/
+
+Solution #1 :
+Time Complexity : O(n), Space Complexity : O(h) :
+
+class Solution {
+    public TreeNode sortedArrayToBST(int[] nums) {
+        return contructSortedArrayToBST(nums, 0, nums.length-1);
+    }
+    public TreeNode contructSortedArrayToBST(int[] nums, int start, int end){
+        if(start > end){
+            return null;
+        }
+
+        if(start == end){
+            TreeNode currentRoot = new TreeNode(nums[start]);
+            return currentRoot;
+        }
+
+        int rootIndex = (start+end)/2;
+        if((end-start)%2 != 0){
+            rootIndex += 1;
+        }
+
+        TreeNode currentRoot = new TreeNode(nums[rootIndex]);
+        currentRoot.left = contructSortedArrayToBST(nums, start, rootIndex-1);
+        currentRoot.right = contructSortedArrayToBST(nums, rootIndex+1, end);
+
+        return currentRoot;
+    }
+}

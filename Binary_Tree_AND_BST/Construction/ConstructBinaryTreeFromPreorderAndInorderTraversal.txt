@@ -1,0 +1,62 @@
+LeetCode : https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/
+
+Solution #1 : 
+Time Complexity : O(n^2), Space Coomplexity : O(h) :
+
+class Solution {
+    int preOrderIndex = 0;
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+       return builTreeWithIndex(preorder, inorder, 0, inorder.length-1);
+    }
+    public TreeNode builTreeWithIndex(int[] preorder, int[] inorder, int startIndexInOrder, int endIndexInOrder){
+        if(startIndexInOrder > endIndexInOrder){
+            return null;
+        }
+
+        TreeNode currenRoot = new TreeNode(preorder[preOrderIndex]);
+        preOrderIndex += 1;
+
+        int rootIndex = startIndexInOrder;
+
+        while(rootIndex <= endIndexInOrder && inorder[rootIndex] != currenRoot.val){
+            rootIndex += 1;
+        }
+
+        currenRoot.left = builTreeWithIndex(preorder, inorder, startIndexInOrder, rootIndex-1);
+        currenRoot.right = builTreeWithIndex(preorder, inorder, rootIndex+1, endIndexInOrder);
+
+        return currenRoot;
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    int preOrderIndex = 0;
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        HashMap<Integer, Integer> inorderIndex = new HashMap<>();
+        for(int i=0;i<inorder.length;i++){
+            inorderIndex.put(inorder[i], i);
+        }
+
+        return builTreeWithIndex(preorder, inorder, 0, inorder.length-1, inorderIndex);
+    }
+    public TreeNode builTreeWithIndex(int[] preorder, int[] inorder, int startIndexInOrder, int endIndexInOrder, HashMap<Integer, Integer> inorderIndex){
+        if(startIndexInOrder > endIndexInOrder){
+            return null;
+        }
+
+        TreeNode currenRoot = new TreeNode(preorder[preOrderIndex]);
+        preOrderIndex += 1;
+
+        int rootIndex = inorderIndex.get(currenRoot.val);
+
+        currenRoot.left = builTreeWithIndex(preorder, inorder, startIndexInOrder, rootIndex-1, inorderIndex);
+        currenRoot.right = builTreeWithIndex(preorder, inorder, rootIndex+1, endIndexInOrder, inorderIndex);
+
+        return currenRoot;
+    }
+}
