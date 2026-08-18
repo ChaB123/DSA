@@ -1,0 +1,70 @@
+LeetCode : https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/description/
+
+Solution #1 : 
+Time Complexity : O(n^2 * logK), Space Complexity : O(K) :
+
+class Solution {
+    public int kthSmallest(int[][] matrix, int k) {
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+
+        for(int i=0;i<matrix.length;i++){
+            for(int j=0;j<matrix[0].length;j++){
+                maxHeap.add(matrix[i][j]);
+
+                while(maxHeap.size() > k){
+                    maxHeap.poll();
+                }
+            }
+        }
+
+        return maxHeap.peek();
+    }
+}
+
+========================================
+
+Solution #2 : 
+Time Complexity : O(n*log(largestElement-smallestElement)), Space Complexity : O(1)
+
+class Solution {
+    public int kthSmallest(int[][] matrix, int k) {
+        int length = matrix.length;
+
+        int min = matrix[0][0];
+        int max = matrix[length-1][length-1];
+
+        while(min < max){
+            int mid = min + (max - min) / 2;
+
+            int numberOfElementEqualToOrLessThanMid = countOfElementsLessThanOrEqualToMid(matrix, mid);
+
+            if(numberOfElementEqualToOrLessThanMid < k){
+                min = mid+1;
+            }else{
+                max = mid;
+            }
+        }
+
+        return min;
+    }
+
+    public int countOfElementsLessThanOrEqualToMid(int[][] matrix, int mid){
+        int row = matrix.length-1;
+        int col = 0;
+
+        int count = 0;
+
+        while(row >= 0 && col < matrix.length){
+            if(matrix[row][col] > mid){
+                row -= 1;
+            }else{
+                count += row+1;
+                col += 1;
+            }
+        }
+
+        return count;
+    }
+}
+
+========================================

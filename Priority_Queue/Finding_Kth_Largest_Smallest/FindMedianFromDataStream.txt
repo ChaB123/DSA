@@ -1,0 +1,161 @@
+LeetCode : https://leetcode.com/problems/find-median-from-data-stream/
+
+Solution #1 : 
+Time Complexity : addNum() = O(logn), findMedian() = O(nlogn), Space Complexity : O(n) :
+
+class MedianFinder {
+    PriorityQueue<Integer> firstHalf;
+    PriorityQueue<Integer> secondHalf;
+
+    public MedianFinder() {
+        firstHalf = new PriorityQueue<>(Comparator.reverseOrder());
+        secondHalf = new PriorityQueue<>();
+    }
+    
+    public void addNum(int num) {
+        if(firstHalf.size() == 0 && secondHalf.size() == 0){
+            firstHalf.add(num);
+        }else if(firstHalf.size() != 0 && secondHalf.size() == 0){
+            if(num <= firstHalf.peek()){
+                firstHalf.add(num);
+            }else{
+                secondHalf.add(num);
+            }
+        }else{
+            if(num <= firstHalf.peek()){
+                firstHalf.add(num);
+            }else{
+                secondHalf.add(num);
+            }
+        }
+    }
+    
+    public double findMedian() {
+        if(firstHalf.size() > secondHalf.size()+1){
+            if((firstHalf.size()+secondHalf.size())%2 == 0){
+                while(firstHalf.size() != secondHalf.size()){
+                    secondHalf.add(firstHalf.poll());
+                }
+            }else{
+                while(firstHalf.size() != secondHalf.size()+1){
+                    secondHalf.add(firstHalf.poll());
+                }
+            }
+        }else if(firstHalf.size()+1 < secondHalf.size()){
+            if((firstHalf.size()+secondHalf.size())%2 == 0){
+                while(firstHalf.size() != secondHalf.size()){
+                    firstHalf.add(secondHalf.poll());
+                }
+            }else{
+                while(firstHalf.size()+1 != secondHalf.size()){
+                    firstHalf.add(secondHalf.poll());
+                }
+            }
+        }
+
+        if((firstHalf.size()+secondHalf.size())%2 == 0){
+            int firstNum = firstHalf.peek();
+            int secondNum = secondHalf.peek();
+
+            return (double) (firstNum+secondNum)/2;
+        }
+
+        if(firstHalf.size() > secondHalf.size()){
+            return (double) firstHalf.peek();
+        }
+
+        return (double) secondHalf.peek();
+    }
+}
+
+========================================
+
+Solution #2 : More cleaner code 
+Time Complexity : addNum() = O(logn), findMedian() = O(nlogn), Space Complexity : O(n) :
+
+class MedianFinder {
+    PriorityQueue<Integer> firstHalf;
+    PriorityQueue<Integer> secondHalf;
+
+    public MedianFinder() {
+        firstHalf = new PriorityQueue<>(Comparator.reverseOrder());
+        secondHalf = new PriorityQueue<>();
+    }
+    
+    public void addNum(int num) {
+        if(firstHalf.isEmpty() || num <= firstHalf.peek()) {
+            firstHalf.add(num);
+        } else {
+            secondHalf.add(num);
+        }
+    }
+    
+    public double findMedian() {
+        // Balance the heaps
+        while(firstHalf.size() > secondHalf.size() + 1) {
+            secondHalf.add(firstHalf.poll());
+        }
+
+        while(secondHalf.size() > firstHalf.size() + 1) {
+            firstHalf.add(secondHalf.poll());
+        }
+
+        // Even number of elements
+        if(firstHalf.size() == secondHalf.size()) {
+            return ((double) firstHalf.peek() + secondHalf.peek()) / 2;
+        }
+
+        // Odd number of elements
+        if(firstHalf.size() > secondHalf.size()) {
+            return firstHalf.peek();
+        }
+
+        return secondHalf.peek();
+    }
+}
+
+========================================
+
+Solution #3 :
+Time Complexity : addNum() = O(logn), findMedian() = O(1), Space Complexity : O(n) :
+
+class MedianFinder {
+    PriorityQueue<Integer> firstHalf;
+    PriorityQueue<Integer> secondHalf;
+
+    public MedianFinder() {
+        // Max heap -> smaller half
+        firstHalf = new PriorityQueue<>(Comparator.reverseOrder());
+
+        // Min heap -> larger half
+        secondHalf = new PriorityQueue<>();
+    }
+    
+    public void addNum(int num) {
+        // Add to the appropriate half
+        if(firstHalf.isEmpty() || num <= firstHalf.peek()) {
+            firstHalf.add(num);
+        } else {
+            secondHalf.add(num);
+        }
+
+        // Rebalance the heaps
+        if(firstHalf.size() > secondHalf.size() + 1) {
+            secondHalf.add(firstHalf.poll());
+        } else if(secondHalf.size() > firstHalf.size() + 1) {
+            firstHalf.add(secondHalf.poll());
+        }
+    }
+    
+    public double findMedian() {
+        if(firstHalf.size() == secondHalf.size()) {
+            return ((double) firstHalf.peek() + secondHalf.peek()) / 2;
+        }
+
+        if(firstHalf.size() > secondHalf.size()) {
+            return firstHalf.peek();
+        }
+
+        return secondHalf.peek();
+    }
+}

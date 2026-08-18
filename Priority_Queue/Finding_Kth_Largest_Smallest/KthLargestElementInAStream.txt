@@ -1,0 +1,30 @@
+LeetCode : https://leetcode.com/problems/kth-largest-element-in-a-stream/description/
+
+Solution #1 :
+Time Complexity : contructor : O(nlogK), add(logK), Space Complexity : O(K) :
+
+class KthLargest {
+    int kth = 0;
+    PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+    public KthLargest(int k, int[] nums) {
+        kth = k;
+        for(int i=0;i<nums.length;i++){
+            minHeap.add(nums[i]);
+
+            if(minHeap.size() > kth){
+                minHeap.poll();
+            }
+        }
+    }
+    
+    public int add(int val) {
+        minHeap.add(val);
+
+        if(minHeap.size() > kth){
+            minHeap.poll();
+        }
+
+        return minHeap.peek();
+    }
+}
