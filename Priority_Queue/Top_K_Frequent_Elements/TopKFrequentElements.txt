@@ -1,0 +1,92 @@
+LeetCode : https://leetcode.com/problems/top-k-frequent-elements/description/
+
+Solution #1 :
+Time Complexity : O(nlogK), Space Complexity : O(n) :
+
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> freq = new HashMap<>();
+
+        for(int i=0;i<nums.length;i++){
+            if(freq.containsKey(nums[i])){
+                freq.put(nums[i], freq.get(nums[i])+1);
+            }else{
+                freq.put(nums[i], 1);
+            }
+        }
+
+        PriorityQueue<int[]> topKElements = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
+
+        for(int key : freq.keySet()){
+            int[] toAdd = new int[2];
+            toAdd[0] = key;
+            toAdd[1] = freq.get(key);
+
+            topKElements.add(toAdd);
+
+            while(topKElements.size() > k){
+                topKElements.poll();
+            }
+        }
+
+        int[] ans = new int[k];
+        int index = 0;
+        while(!topKElements.isEmpty()){
+            int[] tmp = topKElements.poll();
+            ans[index] = tmp[0];
+            index += 1;
+        }
+
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> freq = new HashMap<>();
+
+        for(int i=0;i<nums.length;i++){
+            if(freq.containsKey(nums[i])){
+                freq.put(nums[i], freq.get(nums[i])+1);
+            }else{
+                freq.put(nums[i], 1);
+            }
+        }
+
+        List<Integer>[] store = new ArrayList[nums.length+1];
+        for(int key : freq.keySet()){
+            int index = freq.get(key);
+
+            if(store[index] == null){
+                store[index] = new ArrayList<>();
+            }
+
+            store[index].add(key);
+        }
+
+        int[] ans = new int[k];
+        int index = 0;
+        for(int i=store.length-1;i>=0;i--){
+            if(store[i] == null){
+                continue;
+            }
+
+            List<Integer> addInAns = store[i];
+            for(int j=0;j<addInAns.size();j++){
+                if(index == k){
+                    break;
+                }
+
+                ans[index] = addInAns.get(j);
+                index += 1;
+            }
+        }
+
+        return ans;
+    }
+}

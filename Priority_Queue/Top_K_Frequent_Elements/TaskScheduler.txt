@@ -1,0 +1,115 @@
+LeetCode : https://leetcode.com/problems/task-scheduler/description/
+
+Solution #1 : 
+Time Complexity : O(nlogK), but here k<=26. Hence, final time complexity : O(n), Space Complexity : O(k) ~ O(1) :
+
+class Solution {
+    public int leastInterval(char[] tasks, int n) {
+        HashMap<Character, Integer> freq = new HashMap<>();
+
+        for(int i=0;i<tasks.length;i++){
+            if(freq.containsKey(tasks[i])){
+                freq.put(tasks[i], freq.get(tasks[i])+1);
+            }else{
+                freq.put(tasks[i], 1);
+            }
+        }
+
+        //max heap
+        PriorityQueue<String[]> store = new PriorityQueue<>((a,b) -> {
+            return Integer.compare(Integer.parseInt(b[1]), Integer.parseInt(a[1]));
+        });
+
+        Queue<String[]> coolDownPeriod = new LinkedList<>();
+
+        for(char key : freq.keySet()){
+            String[] currentElement = new String[3];
+            currentElement[0] = key+"";
+            currentElement[1] = freq.get(key)+"";
+            currentElement[2] = 0+"";
+
+            store.add(currentElement);
+        }
+
+        int time = 0;
+
+        while(!store.isEmpty() || !coolDownPeriod.isEmpty()){
+            if(!coolDownPeriod.isEmpty() && Integer.parseInt(coolDownPeriod.peek()[2]) <= time){
+                store.add(coolDownPeriod.poll());
+            }
+
+            if(!store.isEmpty()){
+                String[] currentElement = store.poll();
+                int currentFrequency = Integer.parseInt(currentElement[1]);
+                currentFrequency -= 1;
+
+                int nextPeriodWhenAvailable = time+n+1;
+                currentElement[1] = currentFrequency+"";
+                currentElement[2] = nextPeriodWhenAvailable+"";
+
+                if(currentFrequency > 0){
+                    coolDownPeriod.add(currentElement);
+                }
+            }
+
+            time += 1;
+        }
+
+        return time;
+    }
+}
+
+========================================
+
+Solutoin #2 : More cleaner code :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public int leastInterval(char[] tasks, int n) {
+        HashMap<Character, Integer> freq = new HashMap<>();
+
+        for(int i=0;i<tasks.length;i++){
+            if(freq.containsKey(tasks[i])){
+                freq.put(tasks[i], freq.get(tasks[i])+1);
+            }else{
+                freq.put(tasks[i], 1);
+            }
+        }
+
+        //max heap
+        PriorityQueue<Integer> store = new PriorityQueue<>(Comparator.reverseOrder());
+
+        Queue<int[]> coolDownPeriod = new LinkedList<>();
+
+        for(char key : freq.keySet()){
+            store.add(freq.get(key));
+        }
+
+        int time = 0;
+
+        while(!store.isEmpty() || !coolDownPeriod.isEmpty()){
+            if(!coolDownPeriod.isEmpty() && coolDownPeriod.peek()[1] <= time){
+                store.add(coolDownPeriod.poll()[0]);
+            }
+
+            if(!store.isEmpty()){
+                int currentElementFrequency = store.poll()-1;
+                int nextPeriodWhenAvailable = time+n+1;
+
+                int[] toAdd = new int[2];
+                toAdd[0] = currentElementFrequency;
+                toAdd[1] = nextPeriodWhenAvailable;
+
+                if(currentElementFrequency > 0){
+                    coolDownPeriod.add(toAdd);
+                }
+            }
+
+            time += 1;
+        }
+
+        return time;
+    }
+}
+
+
