@@ -1,0 +1,59 @@
+LeetCode : https://leetcode.com/problems/distant-barcodes/description/
+
+Solution #1 :
+Time Complexity : O(nlogK) (K = number of distinct barcodes), Space Complexity : O(n) :
+
+class Solution {
+    public int[] rearrangeBarcodes(int[] barcodes) {
+        HashMap<Integer, Integer> freq = new HashMap<>();
+        for(int i=0;i<barcodes.length;i++){
+            if(freq.containsKey(barcodes[i])){
+                freq.put(barcodes[i], freq.get(barcodes[i])+1);
+            }else{
+                freq.put(barcodes[i], 1);
+            }
+        }
+
+        PriorityQueue<int[]> store = new PriorityQueue<>((a,b) -> {
+            return Integer.compare(b[1], a[1]);
+        });
+
+        for(int key : freq.keySet()){
+            int[] addElement = new int[3];
+            addElement[0] = key;
+            addElement[1] = freq.get(key);
+            addElement[2] = 0;
+
+            store.add(addElement);
+        }
+
+        Queue<int[]> tmpStore = new LinkedList<>();
+        int[] ans = new int[barcodes.length];
+        int time = 0;
+
+        while(!store.isEmpty() || !tmpStore.isEmpty()){
+            if(!tmpStore.isEmpty() && tmpStore.peek()[2] <= time){
+                store.add(tmpStore.poll());
+            }
+
+            if(!store.isEmpty()){
+                int[] currentElement = store.poll();
+                ans[time] = currentElement[0];
+                currentElement[1] -= 1;
+                currentElement[2] += 2;
+
+                if(currentElement[1] > 0){
+                    tmpStore.add(currentElement);
+                } 
+                time += 1;
+            }
+        }
+
+        return ans;
+    }
+}
+
+========================================
+
+Solution #2 :
+Time Complexity : 
