@@ -1,0 +1,83 @@
+LeetCode : https://leetcode.com/problems/range-sum-of-sorted-subarray-sums/description/
+
+Solution #1 : 
+Time Complexity : O(n^2 * logK), Space Complexity : O(n^2) :
+
+class Solution {
+    public int rangeSum(int[] nums, int n, int left, int right) {
+        int[] flatten = new int[(n*(n+1))/2];
+        int index = 0;
+
+        for(int i=0;i<nums.length;i++){
+            int sum = nums[i];
+            flatten[index] = sum;
+            index += 1;
+            for(int j=i+1;j<nums.length;j++){
+                sum += nums[j];
+                flatten[index] = sum;
+                index += 1;
+            }
+        }
+
+        long sumUntilRight = sumUptoK(flatten, right);
+        long sumUptoLeft = sumUptoK(flatten, left-1);
+
+        return ((int) ((sumUntilRight-sumUptoLeft)%1000000007));
+    }
+    public long sumUptoK(int[] nums, int k){
+        long sum = 0;
+        PriorityQueue<Integer> store = new PriorityQueue<>(Collections.reverseOrder());
+
+        for(int i=0;i<nums.length;i++){
+            store.add(nums[i]);
+
+            while(store.size() > k){
+                store.poll();
+            }
+        }
+
+        while(!store.isEmpty()){
+            sum += (long) store.poll();
+        }
+
+        return sum;
+    }
+}
+
+========================================
+
+Solution #2 : 
+Time Complexity : O(n + right * logn), Space Complexity : O(n) :
+
+class Solution {
+    public int rangeSum(int[] nums, int n, int left, int right) {
+        PriorityQueue<int[]> store = new PriorityQueue<>(
+            (a, b) -> Integer.compare(a[0], b[0])
+        );
+
+        // [sum, startIndex, endIndex]
+        for(int i=0;i<n;i++){
+            store.add(new int[]{nums[i], i, i});
+        }
+
+        long sum = 0;
+
+        for(int count=1;count<=right;count++){
+
+            int[] curr = store.poll();
+
+            if(count >= left){
+                sum += curr[0];
+            }
+
+            int start = curr[1];
+            int end = curr[2];
+
+            if(end + 1 < n){
+                store.add(new int[]{curr[0] + nums[end + 1], start, end + 1});
+            }
+        }
+
+        return (int)(sum % 1000000007);
+    }
+}

@@ -1,0 +1,39 @@
+GeeksForGeeks : https://www.geeksforgeeks.org/problems/merge-k-sorted-arrays/1
+
+Solution #1 : 
+Time Complexity : O(n*m*logn), Space Complexity : O(n*m) (because of ans arraylist) :
+
+class Solution {
+    public ArrayList<Integer> mergeArrays(int[][] mat) {
+        // Code here
+        int length = mat[0].length;
+        PriorityQueue<int[]> store = new PriorityQueue<>((a,b) -> {
+            return Integer.compare(a[0], b[0]);
+        });
+        
+        for(int i=0;i<mat.length;i++){
+            int[] toAdd = new int[3];
+            toAdd[0] = mat[i][0];
+            toAdd[1] = i;
+            toAdd[2] = 0;
+            
+            store.add(toAdd);
+        }
+        
+        ArrayList<Integer> ans = new ArrayList<>();
+        
+        while(!store.isEmpty()){
+            int[] currentElement = store.poll();
+            ans.add(currentElement[0]);
+            
+            currentElement[2] += 1;
+            
+            if(currentElement[2] < length){
+                currentElement[0] = mat[currentElement[1]][currentElement[2]];
+                store.add(currentElement);
+            }
+        }
+        
+        return ans;
+    }
+}

@@ -1,0 +1,33 @@
+LeetCode : https://leetcode.com/problems/find-k-pairs-with-smallest-sums/description/
+
+Solution #1 :
+Time Complexity : O(KlogK), Space Complexity : O(K), where K <= n :
+
+class Solution {
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        List<List<Integer>> ans = new ArrayList<>();
+        PriorityQueue<int[]> store = new PriorityQueue<>((a,b) ->{
+            return Integer.compare(a[2], b[2]);
+        });
+
+        for(int i=0;i<nums1.length && i < k;i++){
+            store.add(new int[]{i, 0, nums1[i]+nums2[0]});
+        }
+
+        while(!store.isEmpty() && k > 0){
+            int[] currentIndex = store.poll();
+            List<Integer> tmp = new ArrayList<>();
+            tmp.add(nums1[currentIndex[0]]);
+            tmp.add(nums2[currentIndex[1]]);
+            ans.add(tmp);
+
+            k -= 1;
+
+            if(currentIndex[1]+1 < nums2.length){
+                store.add(new int[]{currentIndex[0], currentIndex[1]+1, nums1[currentIndex[0]]+nums2[currentIndex[1]+1]});
+            }
+        }
+
+        return ans;
+    }
+}

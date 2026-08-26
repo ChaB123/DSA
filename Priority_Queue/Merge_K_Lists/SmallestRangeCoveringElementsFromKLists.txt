@@ -1,0 +1,106 @@
+LeetCode : https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/description/
+
+Solution #1 : (This will give TLE)
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int[] smallestRange(List<List<Integer>> nums) {
+        int min = 0;
+        int max = 0;
+        boolean firstTime = true;
+
+        int[] indexToMatch = new int[nums.size()];
+
+        boolean canWeContinue = true;
+
+        while(canWeContinue){
+            int[] minMaxIndex = findMinMax(nums, indexToMatch);
+
+            if(firstTime){
+                min = minMaxIndex[0];
+                max = minMaxIndex[1];
+                firstTime = false;
+            }else{
+                if((minMaxIndex[1]-minMaxIndex[0]) < max - min){
+                    min = minMaxIndex[0];
+                    max = minMaxIndex[1];
+                }else if((minMaxIndex[1]-minMaxIndex[0]) == max - min && min > minMaxIndex[0]){
+                    min = minMaxIndex[0];
+                    max = minMaxIndex[1];
+                }
+            }
+
+            if(indexToMatch[minMaxIndex[2]]+1 >= nums.get(minMaxIndex[2]).size()){
+                break;
+            }else{
+                indexToMatch[minMaxIndex[2]] += 1;
+            }
+        }
+
+        return new int[]{min, max};
+    }
+    public int[] findMinMax(List<List<Integer>> nums, int[] indexToMatch){
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int minIndex = 0;
+
+        for(int i=0;i<indexToMatch.length;i++){
+            if(min > nums.get(i).get(indexToMatch[i])){
+                min = nums.get(i).get(indexToMatch[i]);
+                minIndex = i;
+            }
+
+            max = Math.max(max, nums.get(i).get(indexToMatch[i]));
+        }
+
+        return new int[]{min, max, minIndex};
+    }
+}
+
+========================================
+
+Solution #2 : Working solution :
+Time Complexity : O(n*logK), Space Complexity : O(K) :
+
+class Solution {
+    public int[] smallestRange(List<List<Integer>> nums) {
+        int min = 0;
+        int max = Integer.MIN_VALUE;
+        int tmpMax = max;
+
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a,b) -> {
+            return Integer.compare(a[0], b[0]);
+        });
+
+        for(int i=0;i<nums.size();i++){
+            minHeap.add(new int[]{nums.get(i).get(0), i, 0});
+            max = Math.max(max, nums.get(i).get(0));
+        }
+
+        min = minHeap.peek()[0];
+        tmpMax = max;
+
+        while(!minHeap.isEmpty()){
+            int[] tmpMinAndIndex = minHeap.poll();
+
+            if(tmpMinAndIndex[2]+1 >= nums.get(tmpMinAndIndex[1]).size()){
+                break;
+            }
+
+            tmpMax = Math.max(tmpMax, nums.get(tmpMinAndIndex[1]).get(tmpMinAndIndex[2]+1));
+            minHeap.add(new int[]{nums.get(tmpMinAndIndex[1]).get(tmpMinAndIndex[2]+1), tmpMinAndIndex[1], tmpMinAndIndex[2]+1});
+
+            int tmpMin = minHeap.peek()[0];
+
+            if(tmpMax - tmpMin < max - min){
+                max = tmpMax;
+                min = tmpMin;
+            }else if(tmpMax - tmpMin == max - min && min > tmpMin){
+                max = tmpMax;
+                min = tmpMin;
+            }
+        }
+
+        return new int[]{min, max};
+    }
+}
