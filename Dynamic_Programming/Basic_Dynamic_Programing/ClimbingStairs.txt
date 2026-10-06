@@ -1,0 +1,89 @@
+LeetCode : https://leetcode.com/problems/climbing-stairs/description/
+
+Solution #1 : Recursion (will get TLE for below code) :
+Time Complexity : O(2^n), Space Complexity : O(n) :
+
+class Solution {
+    public int climbStairs(int n) {
+        return findNumberOfWaysToClimb(n);
+    }
+    public int findNumberOfWaysToClimb(int n){
+        if(n == 0){
+            return 1;
+        }
+
+        int oneStep = 0;
+        int twoStep = 0;
+
+        if(n-1 >= 0){
+            oneStep = findNumberOfWaysToClimb(n-1);
+        }
+
+        if(n-2 >= 0){
+            twoStep = findNumberOfWaysToClimb(n-2);
+        }
+
+        return oneStep+twoStep;
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int climbStairs(int n) {
+        int[] arr = new int[n+1];
+
+        for(int i=0;i<arr.length;i++){
+            arr[i] = -1;
+        }
+
+        return findNumberOfWaysToClimb(n, arr);
+    }
+    public int findNumberOfWaysToClimb(int n, int[] arr){
+        if(n == 0){
+            return 1;
+        }
+
+        if(arr[n] != -1){
+            return arr[n];
+        }
+
+        int oneStep = 0;
+        int twoStep = 0;
+
+        if(n-1 >= 0){
+            oneStep = findNumberOfWaysToClimb(n-1, arr);
+        }
+
+        if(n-2 >= 0){
+            twoStep = findNumberOfWaysToClimb(n-2, arr);
+        }
+
+        arr[n] = oneStep+twoStep;
+
+        return arr[n];
+    }
+}
+
+========================================
+
+Solution #3 : DP :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int climbStairs(int n) {
+        int[] arr = new int[n+1];
+
+        arr[0] = 1;
+        arr[1] = 1;
+
+        for(int i=2;i<arr.length;i++){
+            arr[i] = arr[i-1]+arr[i-2];
+        }
+
+        return arr[n];
+    }
+}
