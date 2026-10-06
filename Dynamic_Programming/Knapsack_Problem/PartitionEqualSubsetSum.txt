@@ -1,0 +1,48 @@
+LeetCode : https://leetcode.com/problems/partition-equal-subset-sum/description/
+
+Solution #1 : 
+Time Complexity : O(n*(ArraySum/2)), Space Complexity : O(n*(ArraySum/2)) :
+
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int sum = 0;
+        for(int i=0;i<nums.length;i++){
+            sum += nums[i];
+        }
+
+        if(sum%2 != 0){
+            return false;
+        }
+
+        /*
+        This is a trick question. We don't need to track the size at all. If the total sum is X, an equal partition requires each subset to have sum X/2. 
+        Since all numbers are positive, a subset with sum X/2 cannot contain all elements because the entire array sums to X.
+        */
+
+        sum /= 2;
+        boolean[][] knapsack = new boolean[nums.length+1][sum+1];
+
+        for(int i=0;i<knapsack.length;i++){
+            for(int j=0;j<knapsack[0].length;j++){
+                if(i == 0){
+                    knapsack[i][j] = false;
+                }
+
+                if(j == 0){
+                    knapsack[i][j] = true;
+                }
+
+                if(i > 0 && j > 0){
+                    // main logic after initialization
+                    if(nums[i-1] <= j){
+                        knapsack[i][j] = knapsack[i-1][j-nums[i-1]] || knapsack[i-1][j];
+                    }else{
+                        knapsack[i][j] = knapsack[i-1][j];
+                    }
+                }
+            }
+        }
+
+        return knapsack[nums.length][sum];
+    }
+}

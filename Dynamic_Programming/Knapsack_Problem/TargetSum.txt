@@ -1,0 +1,187 @@
+LeetCode : https://leetcode.com/problems/target-sum/description/
+
+Solution #1 : Recursion :
+Time Complexity : O(2^n), Space Complexity : O(n) :
+
+class Solution {
+    int size = 0;
+    public int findTargetSumWays(int[] nums, int target) {
+        findTargetByAddingSymbolToEachElementRecursion(nums, 0, target, 0);
+        return size;
+    }
+    public void findTargetByAddingSymbolToEachElementRecursion(int[] nums, int index, int target, int currSum){
+        if(target == currSum && index == nums.length){
+            size += 1;
+        }
+
+        if(index >= nums.length){
+            return;
+        }
+
+        findTargetByAddingSymbolToEachElementRecursion(nums, index+1, target, currSum+nums[index]);
+        findTargetByAddingSymbolToEachElementRecursion(nums, index+1, target, currSum-nums[index]);
+    }
+}
+
+========================================
+
+Solution #2 : Turning above "void" function into returnable value (such that each state have a returnable value) :
+Time Complexity : O(2^n), Space Complexity : O(n) :
+
+class Solution {
+    public int findTargetSumWays(int[] nums, int target) {
+        return findTargetByMemoization(nums, 0, target, 0, 0);
+    }
+    public int findTargetByMemoization(int[] nums, int index, int target, int currSum, int sizeWhenComplete){
+        if(target == currSum && index == nums.length){
+            return sizeWhenComplete+1;
+        }
+
+        if(index >= nums.length){
+            return 0;
+        }
+
+        int ifWeAdd = findTargetByMemoization(nums, index+1, target, currSum+nums[index], sizeWhenComplete);
+        int ifWeSub = findTargetByMemoization(nums, index+1, target, currSum-nums[index], sizeWhenComplete);
+
+        return ifWeAdd+ifWeSub;
+    }
+}
+
+========================================
+
+Solution #3 : Turning above brute-force recursion to memoization :
+Time Complexity : O(n*possibleValueOfTarget), Space Complexity : O(n*possibleValueOfTarget)
+
+class Solution {
+    public int findTargetSumWays(int[] nums, int target) {
+        
+        /*
+        Constraints:
+
+        1 <= nums.length <= 20
+        0 <= nums[i] <= 1000
+        0 <= sum(nums[i]) <= 1000
+        -1000 <= target <= 1000
+        */
+
+        int[][] memo = new int[21][2001];
+
+        for(int i=0;i<memo.length;i++){
+            for(int j=0;j<memo[0].length;j++){
+                memo[i][j] = -1;
+            }
+        }
+
+        return findTargetByMemoization(nums, 0, target, 0, memo);
+    }
+    public int findTargetByMemoization(int[] nums, int index, int target, int currSum, int[][] memo){
+        if(target == currSum && index == nums.length){
+            return 1;
+        }
+
+        if(index >= nums.length){
+            return 0;
+        }
+
+        if(memo[index][currSum+1000] != -1){
+            return memo[index][currSum+1000];
+        }
+
+        int ifWeAdd = findTargetByMemoization(nums, index+1, target, currSum+nums[index], memo);
+        int ifWeSub = findTargetByMemoization(nums, index+1, target, currSum-nums[index], memo);
+
+        memo[index][currSum+1000] = ifWeAdd+ifWeSub;
+
+        return ifWeAdd+ifWeSub;
+    }
+}
+
+========================================
+
+Solution #4 : Converstion above memoization top-down approach to bottom-up approach (DP) :
+Time Complexity : O(n*possibleValueOfTarget), Space Complexity : O(n*possibleValueOfTarget)
+
+class Solution {
+    public int findTargetSumWays(int[] nums, int target) {
+        
+        /*
+        Constraints:
+
+        1 <= nums.length <= 20
+        0 <= nums[i] <= 1000
+        0 <= sum(nums[i]) <= 1000
+        -1000 <= target <= 1000
+        */
+
+        int[][] memo = new int[nums.length + 1][2001];
+
+        //initialization :
+        for(int currSum = -1000;currSum <= 1000;currSum++){
+            if(currSum == target){
+                memo[nums.length][currSum+1000] = 1;
+            }else{
+                memo[nums.length][currSum+1000] = 0;
+            }
+        }
+
+        //conversion of recusion
+        for(int index = nums.length-1; index >= 0; index--){
+            for(int currSum = -1000; currSum <= 1000; currSum++){
+                int addIndex = currSum+1000+nums[index];
+                int subIndex = currSum+1000-nums[index];
+
+                if((addIndex >= 0 && addIndex <= memo[0].length-1) && (subIndex >= 0 && subIndex <= memo[0].length-1)){
+                    memo[index][currSum+1000] = memo[index+1][addIndex] + memo[index+1][subIndex];
+                }
+            }
+        }
+
+        return memo[0][1000];
+    }
+}
+
+========================================
+
+Solution #5 : Since memo[index] only depends on memo[index + 1], we don't need the entire 2D table. We only need the next row. So we can reduce space from O(n × S) → O(S).
+Time Complexity : O(n*possibleValueOfTarget), Space Complexity : O(possibleValueOfTarget)
+
+class Solution {
+    public int findTargetSumWays(int[] nums, int target) {
+
+        int offset = 1000;
+        int size = 2001;
+
+        int[] next = new int[size];
+        int[] current = new int[size];
+
+        // Base case: index == nums.length
+        next[target + offset] = 1;
+
+        for(int index = nums.length - 1; index >= 0; index--) {
+            for(int currSum = -1000; currSum <= 1000; currSum++) {
+
+                int addIndex = currSum + nums[index] + offset;
+                int subtractIndex = currSum - nums[index] + offset;
+
+                int ways = 0;
+
+                if(addIndex >= 0 && addIndex < size) {
+                    ways += next[addIndex];
+                }
+
+                if(subtractIndex >= 0 && subtractIndex < size) {
+                    ways += next[subtractIndex];
+                }
+
+                current[currSum + offset] = ways;
+            }
+
+            int[] temporary = next;
+            next = current;
+            current = temporary;
+        }
+
+        return next[offset];
+    }
+}

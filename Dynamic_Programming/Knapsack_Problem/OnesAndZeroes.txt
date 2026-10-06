@@ -1,0 +1,87 @@
+LeetCode : https://leetcode.com/problems/ones-and-zeroes/description/
+
+Solution #1 : Brute-force : this will give TLE :
+Time Complexity : O(2^n*K) (K = time to calculate Ones & Zeros of every element), Space Complexity : O(n) :
+
+class Solution {
+    public int findMaxForm(String[] strs, int m, int n) {
+        return findMax(strs, 0, m, n);
+    }
+    public int findMax(String[] strs, int index, int numOfZero, int numOfOne){
+        if(index >= strs.length){
+            return 0;
+        }
+
+        int currZero = 0;
+        int currOne = 0;
+
+        for(int i=0;i<strs[index].length();i++){
+            if(strs[index].charAt(i) == '0'){
+                currZero += 1;
+            }else{
+                currOne += 1;
+            }
+        }
+
+        int ifWeInclude = 0;
+        if(numOfZero >= currZero && numOfOne >= currOne){
+            ifWeInclude = 1 + findMax(strs, index+1, numOfZero-currZero, numOfOne-currOne);
+        }
+
+        int ifWeExclude = findMax(strs, index+1, numOfZero, numOfOne);
+
+        return Math.max(ifWeInclude, ifWeExclude);
+    }
+}
+
+========================================
+
+Solution #2 : Memoization of above solution :
+Time Complexity : O(n*numberOfZero*numberOfOne*K) (K = time to calculate Ones & Zeros of every element), Space Complexity : O(n * numberOfZero * numberOfOne)
+
+class Solution {
+    public int findMaxForm(String[] strs, int m, int n) {
+        int[][][] memo = new int[strs.length+1][m+1][n+1];
+        for (int i = 0; i < memo.length; i++) {
+            for (int j = 0; j < memo[i].length; j++) {
+                Arrays.fill(memo[i][j], -1);
+            }
+        }
+
+        return findMax(strs, 0, m, n, memo);
+    }
+    public int findMax(String[] strs, int index, int numOfZero, int numOfOne, int[][][] memo){
+        if(index >= strs.length){
+            return 0;
+        }
+
+        if(memo[index][numOfZero][numOfOne] != -1){
+            return memo[index][numOfZero][numOfOne];
+        }
+
+        int currZero = 0;
+        int currOne = 0;
+
+        for(int i=0;i<strs[index].length();i++){
+            if(strs[index].charAt(i) == '0'){
+                currZero += 1;
+            }else{
+                currOne += 1;
+            }
+        }
+
+        int ifWeInclude = 0;
+        if(numOfZero >= currZero && numOfOne >= currOne){
+            ifWeInclude = 1 + findMax(strs, index+1, numOfZero-currZero, numOfOne-currOne, memo);
+        }
+
+        int ifWeExclude = findMax(strs, index+1, numOfZero, numOfOne, memo);
+
+        memo[index][numOfZero][numOfOne] = Math.max(ifWeInclude, ifWeExclude);
+        return memo[index][numOfZero][numOfOne];
+    }
+}
+
+========================================
+
+Solution #3 : 
