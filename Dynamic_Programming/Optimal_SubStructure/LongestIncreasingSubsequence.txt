@@ -1,0 +1,139 @@
+LeetCode : https://leetcode.com/problems/longest-increasing-subsequence/description/
+
+Solution #1 : Brute force recursion (will give TLE) :
+Time Complexity : O(2^n), Space Complexity O(n) :
+
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        return lengthofLISRecursion(nums, 0, -1);
+    }
+    public int lengthofLISRecursion(int[] nums, int index, int lastIndex){
+        if(index == nums.length){
+            return 0;
+        }
+
+        int canWeContinue = 0;
+        if(lastIndex == -1 || nums[index] > nums[lastIndex]){
+            canWeContinue = 1+lengthofLISRecursion(nums, index+1, index);
+        }
+
+        int ifWeSkipCurrentElement = lengthofLISRecursion(nums, index+1, lastIndex);
+
+        return Math.max(canWeContinue, ifWeSkipCurrentElement);
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization :
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        int[][] arr = new int[nums.length+1][nums.length+1];
+
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        return lengthofLISRecursion(nums, 0, -1, arr);
+    }
+    public int lengthofLISRecursion(int[] nums, int index, int lastIndex, int[][] arr){
+        if(index == nums.length){
+            return 0;
+        }
+
+        if(lastIndex != -1 && arr[index][lastIndex] != -1){
+            return arr[index][lastIndex];
+        }
+
+        int canWeContinue = 0;
+        if(lastIndex == -1 || nums[index] > nums[lastIndex]){
+            canWeContinue = 1+lengthofLISRecursion(nums, index+1, index, arr);
+        }
+
+        int ifWeSkipCurrentElement = lengthofLISRecursion(nums, index+1, lastIndex, arr);
+
+        if(lastIndex == -1){
+            return Math.max(canWeContinue, ifWeSkipCurrentElement);
+        }
+
+        arr[index][lastIndex] = Math.max(canWeContinue, ifWeSkipCurrentElement);
+
+        return arr[index][lastIndex];
+    }
+}
+
+========================================
+
+Solution #3 : DP :
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        return lengthofLISDP(nums);
+    }
+    public int lengthofLISDP(int[] nums){
+        int[][] arr = new int[nums.length+1][nums.length+1];
+
+        //just for depiction purpose. Array always initialize with 0.
+        for(int i=arr.length-1;i<arr.length;i++){
+            for(int j=0;j<arr.length;j++){
+                arr[i][j] = 0;
+            }
+        }
+
+        for(int i=arr.length-2;i>=0;i--){
+            for(int j=arr.length-1;j>=0;j--){
+                int canWeContinue = 0;
+                if(j == 0 || nums[i] > nums[j-1]){
+                    canWeContinue = 1+arr[i+1][i+1];
+                }
+
+                int weSkip = arr[i+1][j];
+
+                arr[i][j] = Math.max(canWeContinue, weSkip);
+            }
+        }
+
+        return arr[0][0];
+    }
+}
+
+========================================
+
+Solution #4 : Optimised DP : 
+Time Complexity : O(n^2), Space Complexity : O(n) :
+
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        return lengthofLISDP(nums);
+    }
+    public int lengthofLISDP(int[] nums){
+        int n = nums.length;
+
+        int[] previousRow = new int[n+1];
+        int[] currentRow = new int[n+1];
+
+        for(int i = n-1;i >= 0;i--){
+            for(int j = 0; j <= n; j++){
+                int canWeContinue = 0;
+
+                if(j == 0 || nums[i] > nums[j-1]){
+                    canWeContinue = 1+previousRow[i+1];
+                }
+
+                int weSkip = previousRow[j];
+                currentRow[j] = Math.max(canWeContinue, weSkip);
+            }
+
+            int[] temp = previousRow;
+            previousRow = currentRow;
+            currentRow = temp;
+        }
+
+        return previousRow[0];
+    }
+}

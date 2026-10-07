@@ -1,0 +1,119 @@
+LeetCode : https://leetcode.com/problems/minimum-path-sum/description/
+
+Solution #1 : Brute force recursion (will give TLE) :
+Time Complexity : O(2^(m+n)), Space Complexity : O(m+n) :
+
+class Solution {
+    public int minPathSum(int[][] grid) {
+        return findMinPathSum(grid, 0, 0);
+    }
+    public int findMinPathSum(int[][] grid, int i, int j){
+        if(i >= grid.length){
+            return -1;
+        }
+
+        if(j >= grid[0].length){
+            return -1;
+        }
+
+        if(i == grid.length-1 && j == grid[0].length-1){
+            return grid[i][j];
+        }
+
+        int moveDown = findMinPathSum(grid, i+1, j);
+        int moveRight = findMinPathSum(grid, i, j+1);
+
+        if(moveDown == -1){
+            return grid[i][j]+moveRight;
+        }else if(moveRight == -1){
+            return grid[i][j]+moveDown;
+        }
+
+        return grid[i][j]+Math.min(moveDown, moveRight);
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization :
+Time Complexity : O(n*m), Space Complexity : O(n*m) :
+
+class Solution {
+    public int minPathSum(int[][] grid) {
+        int[][] arr = new int[grid.length+1][grid[0].length+1];
+
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        return findMinPathSum(grid, 0, 0, arr);
+    }
+    public int findMinPathSum(int[][] grid, int i, int j, int[][] arr){
+        if(i >= grid.length){
+            return -1;
+        }
+
+        if(j >= grid[0].length){
+            return -1;
+        }
+
+        if(i == grid.length-1 && j == grid[0].length-1){
+            return grid[i][j];
+        }
+
+        if(arr[i][j] != -1){
+            return arr[i][j];
+        }
+
+        int moveDown = findMinPathSum(grid, i+1, j, arr);
+        int moveRight = findMinPathSum(grid, i, j+1, arr);
+
+        if(moveDown == -1){
+            arr[i][j] = grid[i][j]+moveRight;
+            return arr[i][j];
+        }else if(moveRight == -1){
+            arr[i][j] = grid[i][j]+moveDown;
+            return arr[i][j];
+        }
+
+        arr[i][j] = grid[i][j]+Math.min(moveDown, moveRight);
+
+        return arr[i][j];
+    }
+}
+
+========================================
+
+Solution #3 : DP :
+Time Complexity : O(m*n), Space Complexity : O(m*n) :
+
+class Solution {
+    public int minPathSum(int[][] grid) {
+        return dpSolution(grid);
+    }
+    public int dpSolution(int[][] grid){
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] arr = new int[m][n];
+
+        arr[0][0] = grid[0][0];
+
+        for(int i=1;i<n;i++){
+            arr[0][i] = grid[0][i] + arr[0][i-1];
+        }
+
+        for(int i=1;i<m;i++){
+            arr[i][0] = grid[i][0] + arr[i-1][0];
+        }
+
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                arr[i][j] = grid[i][j] + Math.min(arr[i-1][j], arr[i][j-1]);
+            }
+        }
+
+        return arr[m-1][n-1];
+    }
+}

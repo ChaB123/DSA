@@ -1,0 +1,121 @@
+LeetCode : https://leetcode.com/problems/house-robber/description/
+
+Solution #1 : Brute force recursion (below solution will give TLE).
+Time Complexity : O(2^n), Space Complexity : O(n) :
+
+class Solution {
+    public int rob(int[] nums) {
+        return robAdjacent(nums, 0, false);
+    }
+    public int robAdjacent(int[] nums, int index, boolean previous){
+        if(index == nums.length){
+            return 0;
+        }
+
+        //we have three choices. Previous house was robbed?
+        //no 
+        //then we have two choise. Either we can rob current one or not.
+        if(!previous){
+            //previous was false. We robbed current house. So, previous now becomes : true;
+            int robCurrent = nums[index]+robAdjacent(nums, index+1, !previous);
+
+            //previous was false. We did not robbed current house. So, previous is still false;
+            int notRobCurrent = robAdjacent(nums, index+1, previous);
+            return Math.max(robCurrent, notRobCurrent);
+        }
+
+        //yes
+        //then we can't rob current house
+        //previous is true. We did not robbed current house. So, previous (current) now becomes : false;
+        return robAdjacent(nums, index+1, !previous);
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int rob(int[] nums) {
+        int[][] arr = new int[nums.length+1][2];
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        return robAdjacent(nums, 0, false, arr);
+    }
+    public int robAdjacent(int[] nums, int index, boolean previous, int[][] arr){
+        if(index == nums.length){
+            return 0;
+        }
+
+        if(previous && arr[index][0] != -1){
+            return arr[index][0];
+        }else if(!previous && arr[index][1] != -1){
+            return arr[index][1];
+        }
+
+        if(!previous){
+            int robCurrent = nums[index]+robAdjacent(nums, index+1, !previous, arr);
+            int notRobCurrent = robAdjacent(nums, index+1, previous, arr);
+
+            arr[index][1] = Math.max(robCurrent, notRobCurrent);
+            return arr[index][1];
+        }
+
+        arr[index][0] = robAdjacent(nums, index+1, !previous, arr);
+
+        return arr[index][0];
+    }
+}
+
+========================================
+
+Solution #3 : DP : 
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int rob(int[] nums) {
+        return dpSolution(nums);
+    }
+    public int dpSolution(int[] nums){
+        int[][] arr = new int[nums.length+1][2];
+        arr[nums.length][0] = 0;
+        arr[nums.length][1] = 0;
+
+        for(int i=nums.length-1;i>=0;i--){
+            arr[i][1] = Math.max(nums[i]+arr[i+1][0], arr[i+1][1]);
+            arr[i][0] = arr[i+1][1];
+        }
+
+        return Math.max(arr[0][0], arr[0][1]);
+    }
+}
+
+========================================
+
+Solution #4 : More optimised solution of DP :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int rob(int[] nums) {
+        return dpSolution(nums);
+    }
+    public int dpSolution(int[] nums){
+        int[] arr = new int[nums.length];
+        arr[0] = nums[0];
+
+        if(nums.length > 1){
+            arr[1] = Math.max(arr[0], nums[1]);
+        }
+
+        for(int i=2;i<nums.length;i++){
+            arr[i] = Math.max(nums[i]+arr[i-2], arr[i-1]);
+        }
+
+        return arr[nums.length-1];
+    }
+}

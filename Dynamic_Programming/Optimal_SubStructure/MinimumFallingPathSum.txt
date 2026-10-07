@@ -1,0 +1,119 @@
+LeetCode : https://leetcode.com/problems/minimum-falling-path-sum/description/
+
+Solution #1 : Brute force recursion (will give TLE) :
+Time Complexity : O(3^n), Space Complexity : O(n) :
+
+class Solution {
+    public int minFallingPathSum(int[][] matrix) {
+        int minVal = Integer.MAX_VALUE;
+        for(int j=0;j<matrix[0].length;j++){
+            minVal = Math.min(minVal, minFallingPathSumRecursion(matrix, 0, j));
+        }
+        
+        return minVal;
+    }
+    public int minFallingPathSumRecursion(int[][] matrix, int i, int j){
+        if(j < 0 || j >= matrix[0].length){
+            return Integer.MAX_VALUE;
+        }
+
+        if(i == matrix.length-1){
+            return matrix[i][j];
+        }
+
+        int leftDown = minFallingPathSumRecursion(matrix, i+1, j-1);
+        int down = minFallingPathSumRecursion(matrix, i+1, j);
+        int rightDown = minFallingPathSumRecursion(matrix, i+1, j+1);
+
+        return matrix[i][j]+Math.min(down, Math.min(leftDown, rightDown));
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization (below still gave TLE) :
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int minFallingPathSum(int[][] matrix) {
+        int[][] arr = new int[matrix.length+1][matrix.length+1];
+
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr.length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        int minVal = Integer.MAX_VALUE;
+        for(int j=0;j<matrix[0].length;j++){
+            minVal = Math.min(minVal, minFallingPathSumRecursion(matrix, 0, j, arr));
+        }
+        
+        return minVal;
+    }
+    public int minFallingPathSumRecursion(int[][] matrix, int i, int j, int[][] arr){
+        if(j < 0 || j >= matrix[0].length){
+            return Integer.MAX_VALUE;
+        }
+
+        if(i == matrix.length-1){
+            return matrix[i][j];
+        }
+
+        if(arr[i][j] != -1){
+            return arr[i][j];
+        }
+
+        int leftDown = minFallingPathSumRecursion(matrix, i+1, j-1, arr);
+        int down = minFallingPathSumRecursion(matrix, i+1, j, arr);
+        int rightDown = minFallingPathSumRecursion(matrix, i+1, j+1, arr);
+
+        arr[i][j] = matrix[i][j]+Math.min(down, Math.min(leftDown, rightDown));
+
+        return arr[i][j];
+    }
+}
+
+========================================
+
+Solution #3 : DP :
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int minFallingPathSum(int[][] matrix) {
+        return minFallingPathSumDP(matrix);
+    }
+    public int minFallingPathSumDP(int[][] matrix){
+        int minVal = Integer.MAX_VALUE;
+        int[][] arr = new int[matrix.length][matrix[0].length];
+        
+        for(int i=arr.length-1;i<arr.length;i++){
+            for(int j=arr[0].length-1;j>=0;j--){
+                arr[i][j] = matrix[i][j];
+            }
+        }
+
+        for(int i=arr.length-2;i>=0;i--){
+            for(int j=arr[0].length-1;j>=0;j--){
+                int leftDown = Integer.MAX_VALUE;
+                if(j-1 >= 0){
+                    leftDown = arr[i+1][j-1];
+                }
+                int down = arr[i+1][j];
+
+                int rightDown = Integer.MAX_VALUE;
+                if(j+1 < arr[0].length){
+                    rightDown = arr[i+1][j+1];
+                }
+
+                arr[i][j] = matrix[i][j]+Math.min(down, Math.min(leftDown, rightDown));
+            }
+        }
+
+        for(int j=0;j<arr.length;j++){
+            minVal = Math.min(minVal, arr[0][j]);
+        }
+
+        return minVal;
+    }
+}

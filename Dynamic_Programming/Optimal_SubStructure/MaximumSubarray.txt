@@ -1,0 +1,68 @@
+LeetCode : https://leetcode.com/problems/maximum-subarray/description/
+
+Solution #1 : Brute force recursion :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int maxSubArray(int[] nums) {
+        if(nums.length == 1){
+            return nums[0];
+        }
+
+        return findMaxSubArr(nums, 0, 0, Integer.MIN_VALUE);
+    }
+    public int findMaxSubArr(int[] nums, int index, int currSum, int maxSum){
+        if(index == nums.length){
+            return maxSum;
+        }
+
+        int continueSum = nums[index]+currSum;
+        int startNew = nums[index];
+
+        if(continueSum > startNew){
+            return findMaxSubArr(nums, index+1, continueSum, Math.max(continueSum, maxSum));
+        }
+
+        return findMaxSubArr(nums, index+1, startNew, Math.max(maxSum, startNew));
+    }
+}
+
+========================================
+
+Solution #2 : DP (there is not much use of implementing memoization here) :
+Time Complexity : O(n), Space Complexity : O(n) :
+
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int[] arr = new int[nums.length];
+        arr[0] = nums[0];
+
+        int max = nums[0];
+
+        for(int i=1;i<nums.length;i++){
+            arr[i] = Math.max(arr[i-1]+nums[i], nums[i]);
+            max = Math.max(arr[i], max);
+        }
+
+        return max;
+    }
+}
+
+========================================
+
+Solution #3 : Kadane's Algo :
+Time Complexity : O(n), Space Complexity : O(1) :
+
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int currSum = nums[0];
+        int max = nums[0];
+
+        for(int i=1;i<nums.length;i++){
+            currSum = Math.max(currSum+nums[i], nums[i]);
+            max = Math.max(currSum, max);
+        }
+
+        return max;
+    }
+}
