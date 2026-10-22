@@ -1,0 +1,223 @@
+LeetCode : https://leetcode.com/problems/coin-change/description/
+
+Solution #1 : Brute force recursion (will give TLE) :
+Time Complexity : O(2^(n+amount)), Space Complexity : O(n) :
+
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        return coinChangeRecursion(coins, 0, amount);
+    }
+    public int coinChangeRecursion(int[] coins, int index, int amount){
+        if(amount < 0 || index >= coins.length){
+            return -1;
+        }
+
+        if(amount == 0){
+            return 0;
+        }
+
+        int includeCurrentCoin = coinChangeRecursion(coins, index, amount-coins[index]);
+        int skipCurrentCoin = coinChangeRecursion(coins, index+1, amount);
+
+        int toReturn = 0;
+
+        if(includeCurrentCoin == -1){
+            //if includeCurrentCoin turn out to be invalid choice
+            toReturn = skipCurrentCoin;
+        }else if(skipCurrentCoin == -1){
+            //if skipCurrentCoin turn out to be invalid choice
+            toReturn = 1+includeCurrentCoin;
+        }else{
+            //if both are valid choice
+            toReturn = Math.min(1+includeCurrentCoin, skipCurrentCoin);
+        }
+
+        return toReturn;
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization (below solution will still give TLE) :
+Time Complexity : O(n*amount), Space Complexity : O(n*amount) :
+
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        int[][] arr = new int[coins.length+1][amount+1];
+
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        return coinChangeRecursion(coins, 0, amount, arr);
+    }
+    public int coinChangeRecursion(int[] coins, int index, int amount, int[][] arr){
+        if(amount < 0 || index >= coins.length){
+            return -1;
+        }
+
+        if(amount == 0){
+            return 0;
+        }
+
+        if(arr[index][amount] != -1){
+            return arr[index][amount];
+        }
+
+        int includeCurrentCoin = coinChangeRecursion(coins, index, amount-coins[index], arr);
+        int skipCurrentCoin = coinChangeRecursion(coins, index+1, amount, arr);
+
+        int toReturn = 0;
+
+        if(includeCurrentCoin == -1){
+            //if includeCurrentCoin turn out to be invalid choice
+            toReturn = skipCurrentCoin;
+        }else if(skipCurrentCoin == -1){
+            //if skipCurrentCoin turn out to be invalid choice
+            toReturn = 1+includeCurrentCoin;
+        }else{
+            //if both are valid choice
+            toReturn = Math.min(1+includeCurrentCoin, skipCurrentCoin);
+        }
+
+        arr[index][amount] = toReturn;
+
+        return arr[index][amount];
+    }
+}
+
+========================================
+
+Solution #3 : DP :
+Time Complexity : O(n*amount), Space Complexity : O(n*amount) :
+
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        return coinChangeDP(coins, amount);
+    }
+    public int coinChangeDP(int[] coins, int amount){
+        int[][] arr = new int[coins.length+1][amount+1];
+
+        for(int i=0;i<arr.length;i++){
+            arr[i][0] = 0;
+        }
+
+        for(int j = 1; j < arr[0].length; j++){
+            arr[arr.length-1][j] = -1;
+        }
+
+        for(int i=arr.length-2;i>=0;i--){
+            for(int j=1;j<arr[0].length;j++){
+                int includeCurrentCoin = -1;
+
+                if(j >= coins[i]){
+                    includeCurrentCoin = arr[i][j-coins[i]];
+                }
+
+                int skipCurrentCoin = arr[i+1][j];
+
+                if(includeCurrentCoin == -1){
+                    arr[i][j] = skipCurrentCoin;
+                }else if(skipCurrentCoin == -1){
+                    arr[i][j] = 1+includeCurrentCoin;
+                }else{
+                    arr[i][j] = Math.min(1+includeCurrentCoin, skipCurrentCoin);
+                }
+            }
+        }
+
+        return arr[0][amount];
+    }
+}
+
+========================================
+
+Solution #4 : 1D-DP :
+Time Complexity : O(n*amount), Space Complexity : O(n or amount, whichever is more)
+
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        return coinChangeDP(coins, amount);
+    }
+    public int coinChangeDP(int[] coins, int amount){
+        int arr = new int[coins.length+1];
+        int[] amt = new int[amount+1];
+
+        amt[0] = 0;
+
+        for(int j=1;j<amt.length;j++){
+            amt[j] = -1;
+        }
+
+        for(int i=arr.length-2;i>=0;i--){
+            for(int j=1;j<amt.length;j++){
+                int includeCurrentCoin = -1;
+
+                if(j >= coins[i]){
+                    includeCurrentCoin = amt[j-coins[i]];
+                }
+
+                int skipCurrentCoin = amt[j];
+
+                if(includeCurrentCoin == -1){
+                    arr[i] = skipCurrentCoin;
+                }else if(skipCurrentCoin == -1){
+                    arr[i] = 1+includeCurrentCoin;
+                }else{
+                    arr[i] = Math.min(1+includeCurrentCoin, skipCurrentCoin);
+                }
+
+                amt[j] = arr[i];
+            }
+        }
+
+        return arr[0];
+    }
+}
+
+========================================
+
+Solution #5 : 1D-DP (more optimised above solution) :
+Time Complexity : O(n*amount), Space Complexity : O(amount) :
+
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        return coinChangeDP(coins, amount);
+    }
+    public int coinChangeDP(int[] coins, int amount){
+        int arr = 0;
+        int[] amt = new int[amount+1];
+
+        amt[0] = 0;
+
+        for(int j=1;j<amt.length;j++){
+            amt[j] = -1;
+        }
+
+        for(int i=coins.length-1;i>=0;i--){
+            for(int j=1;j<amt.length;j++){
+                int includeCurrentCoin = -1;
+
+                if(j >= coins[i]){
+                    includeCurrentCoin = amt[j-coins[i]];
+                }
+
+                int skipCurrentCoin = amt[j];
+
+                if(includeCurrentCoin == -1){
+                    arr = skipCurrentCoin;
+                }else if(skipCurrentCoin == -1){
+                    arr = 1+includeCurrentCoin;
+                }else{
+                    arr = Math.min(1+includeCurrentCoin, skipCurrentCoin);
+                }
+
+                amt[j] = arr;
+            }
+        }
+
+        return arr;
+    }
+}

@@ -1,0 +1,193 @@
+LeetCode : https://leetcode.com/problems/edit-distance/description/
+
+Solution #1 : Brute force recursion :
+Time Complexity : O(3^(m+n)), Space Complexity : O(m+n) :
+
+class Solution {
+    public int minDistance(String word1, String word2) {
+        if(word2.length() == 0){
+            return word1.length();
+        }
+
+        if(word1.length() == 0){
+            return word2.length();
+        }
+
+        return minDistanceRecursion(word1, word2, 0, 0);
+    }
+    public int minDistanceRecursion(String word1, String word2, int index1, int index2){
+        if(index1 >= word1.length() && index2 < word2.length()){
+            return word2.length()-index2;
+        }
+
+        if(index1 < word1.length() && index2 >= word2.length()){
+            return word1.length()-index1;
+        }
+
+        if(index1 >= word1.length() || index2 >= word2.length()){
+            return 0;
+        }
+
+        if(word1.charAt(index1) == word2.charAt(index2)){
+            return minDistanceRecursion(word1, word2, index1+1, index2+1);
+        }
+
+        int removeWord1 = 1+minDistanceRecursion(word1, word2, index1+1, index2);
+        int replaceWord1 = 1+minDistanceRecursion(word1, word2, index1+1, index2+1);
+        int insert1 = 1+minDistanceRecursion(word1, word2, index1, index2+1);
+
+        int betweenRemoveReplace = Math.min(removeWord1, replaceWord1);
+        return Math.min(betweenRemoveReplace, insert1);
+    }
+}
+
+========================================
+
+Solution #2 : Recursion with memoization :
+Time Complexity : O(m*n), Space Complexity : O(m*n) :
+
+class Solution {
+    public int minDistance(String word1, String word2) {
+        if(word2.length() == 0){
+            return word1.length();
+        }
+
+        if(word1.length() == 0){
+            return word2.length();
+        }
+
+        int[][] arr = new int[word1.length()][word2.length()];
+
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        return minDistanceMemoization(word1, word2, 0, 0, arr);
+    }
+    public int minDistanceMemoization(String word1, String word2, int index1, int index2, int[][] arr){
+        if(index1 >= word1.length() && index2 < word2.length()){
+            return word2.length()-index2;
+        }
+
+        if(index1 < word1.length() && index2 >= word2.length()){
+            return word1.length()-index1;
+        }
+
+        if(index1 >= word1.length() || index2 >= word2.length()){
+            return 0;
+        }
+
+        if(arr[index1][index2] != -1){
+            return arr[index1][index2];
+        }
+
+        if(word1.charAt(index1) == word2.charAt(index2)){
+            arr[index1][index2] = minDistanceMemoization(word1, word2, index1+1, index2+1, arr);
+            return arr[index1][index2];
+        }
+
+        int removeWord1 = 1+minDistanceMemoization(word1, word2, index1+1, index2, arr);
+        int replaceWord1 = 1+minDistanceMemoization(word1, word2, index1+1, index2+1, arr);
+        int insert1 = 1+minDistanceMemoization(word1, word2, index1, index2+1, arr);
+
+        int betweenRemoveReplace = Math.min(removeWord1, replaceWord1);
+
+        arr[index1][index2] = Math.min(betweenRemoveReplace, insert1);
+        return arr[index1][index2];
+    }
+}
+
+========================================
+
+Solution #3 : DP :
+Time Complexity : O(m*n), Space Complexity : O(m*n) :
+
+class Solution {
+    public int minDistance(String word1, String word2) {
+        return minDistanceDP(word1, word2);
+    }
+    public int minDistanceDP(String word1, String word2){
+        int m = word1.length();
+        int n = word2.length();
+        int[][] arr = new int[m+1][n+1];
+
+        //initialization
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                if(i >= m && j < n){
+                    arr[i][j] = n-j;
+                }
+
+                if(i < m && j >= n){
+                    arr[i][j] = m-i;
+                }
+
+                if(i >= m && j >= n){
+                    arr[i][j] = 0;
+                }
+            }
+        }
+
+        for(int i=m-1;i>=0;i--){
+            for(int j=n-1;j>=0;j--){
+                if(word1.charAt(i) == word2.charAt(j)){
+                    arr[i][j] = arr[i+1][j+1];
+                }else{
+                    int remove = 1+arr[i+1][j];
+                    int replace = 1+arr[i+1][j+1];
+                    int insert = 1+arr[i][j+1];
+                    int betweenRemoveReplace = Math.min(remove, replace);
+                    arr[i][j] = Math.min(betweenRemoveReplace, insert);
+                }
+            }
+        }
+
+        return arr[0][0];
+    }
+}
+
+========================================
+
+Solution #4 : 1-D DP :
+Time Complexity : O(m*n), Space Complexity : O(n)
+
+class Solution {
+    public int minDistance(String word1, String word2) {
+        return minDistanceDP(word1, word2);
+    }
+    public int minDistanceDP(String word1, String word2){
+        int m = word1.length();
+        int n = word2.length();
+        int[] arr = new int[n+1];
+
+        //initialization
+        for(int j=0;j<=n;j++){
+            arr[j] = n-j;
+        }
+
+        for(int i=m-1;i>=0;i--){
+            int diagonal = arr[n];
+            arr[n] = m-i;
+            
+            for(int j=n-1;j>=0;j--){
+                int oldValue = arr[j];
+
+                if(word1.charAt(i) == word2.charAt(j)){
+                    arr[j] = diagonal;
+                }else{
+                    int remove = 1+arr[j];
+                    int replace = 1+diagonal;
+                    int insert = 1+arr[j+1];
+                    int betweenRemoveReplace = Math.min(remove, replace);
+                    arr[j] = Math.min(betweenRemoveReplace, insert);
+                }
+
+                diagonal = oldValue;
+            }
+        }
+
+        return arr[0];
+    }
+}

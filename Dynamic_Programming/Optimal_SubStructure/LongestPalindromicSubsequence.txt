@@ -1,0 +1,191 @@
+LeetCode : https://leetcode.com/problems/longest-palindromic-subsequence/description/
+
+Solution #1 : Brute force recursion :
+Time Complexity : O(n * 2^n), Space Complexity : O(n^2) :
+
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        if(s.length() == 1){
+            return 1;
+        }
+
+        return longestPalindromeSubseqRecursion(s, 0, "");
+    }
+    public int longestPalindromeSubseqRecursion(String arr, int index, String str){
+        if(index == arr.length()){
+            if(confirmPalindrome(str)){
+                return str.length();
+            }else{
+                return 0;
+            }
+        }
+
+        int ifWeInclude = longestPalindromeSubseqRecursion(arr, index+1, str+arr.charAt(index));
+        int ifWeExclude = longestPalindromeSubseqRecursion(arr, index+1, str);
+
+        return Math.max(ifWeInclude, ifWeExclude);
+    }
+    public boolean confirmPalindrome(String s){
+        int i=0;
+        int j=s.length()-1;
+
+        while(i<=j){
+            if(s.charAt(i) != s.charAt(j)){
+                return false;
+            }
+            i += 1;
+            j -= 1;
+        }
+
+        return true;
+    }
+}
+
+========================================
+
+Solution #2 : Better brute force :
+Time Complexity : O(2^n), Space Complexity : O(n) :
+
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        if(s.length() == 1){
+            return 1;
+        }
+
+        return longestPalindromeSubseqRecursionAgain(s, 0, s.length()-1);
+    }
+    public int longestPalindromeSubseqRecursionAgain(String str, int start, int end){
+        if(start > end){
+            return 0;
+        }
+
+        if(start == end){
+            return 1;
+        }
+
+        if(str.charAt(start) == str.charAt(end)){
+            return 2+longestPalindromeSubseqRecursionAgain(str, start+1, end-1);
+        }
+
+        int ifWeIncludeStart = longestPalindromeSubseqRecursionAgain(str, start, end-1);
+        int ifWeExcludeEnd = longestPalindromeSubseqRecursionAgain(str, start+1, end);
+
+        return Math.max(ifWeIncludeStart, ifWeExcludeEnd);
+    }
+}
+
+========================================
+
+Solution #3 : Memoization :
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        if(s.length() == 1){
+            return 1;
+        }
+
+        int[][] arr = new int[s.length()][s.length()];
+
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                arr[i][j] = -1;
+            }
+        }
+
+        return longestPalindromeSubseqRecursionAgain(s, 0, s.length()-1, arr);
+    }
+    public int longestPalindromeSubseqRecursionAgain(String str, int start, int end, int[][] arr){
+        if(start > end){
+            return 0;
+        }
+
+        if(start == end){
+            return 1;
+        }
+
+        if(arr[start][end] != -1){
+            return arr[start][end];
+        }
+
+        if(str.charAt(start) == str.charAt(end)){
+            arr[start][end] = 2+longestPalindromeSubseqRecursionAgain(str, start+1, end-1, arr);
+            return arr[start][end];
+        }
+
+        int ifWeIncludeStart = longestPalindromeSubseqRecursionAgain(str, start, end-1, arr);
+        int ifWeExcludeEnd = longestPalindromeSubseqRecursionAgain(str, start+1, end, arr);
+
+        arr[start][end] = Math.max(ifWeIncludeStart, ifWeExcludeEnd);
+        return arr[start][end];
+    }
+}
+
+========================================
+
+Solution #4 : DP :
+Time Complexity : O(n^2), Space Complexity : O(n^2) :
+
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        if(s.length() == 1){
+            return 1;
+        }
+
+        int[][] arr = new int[s.length()][s.length()];
+
+        //arr initilization :
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                if(i > j){
+                    arr[i][j] = 0;
+                }else if(i == j){
+                    arr[i][j] = 1;
+                }
+            }
+        }
+
+        for(int i=arr.length-2;i>=0;i--){
+            for(int j=i+1;j<arr[0].length;j++){
+                if(s.charAt(i) == s.charAt(j)){
+                    arr[i][j] = 2+arr[i+1][j-1];
+                }else{
+                    arr[i][j] = Math.max(arr[i][j-1], arr[i+1][j]);
+                }
+            }
+        }
+
+        return arr[0][arr.length-1];
+    }
+}
+
+========================================
+
+Solution #5 : 1-D DP :
+Time Complexity : O(n^2), Space Complexity : O(n) :
+
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+        int[] arr = new int[n];
+
+        for(int i=n-1;i>=0;i--){
+            int diagonal = 0;
+            arr[i] = 1;
+
+            for(int j=i+1;j<n;j++){
+                int temp = arr[j];
+
+                if(s.charAt(i) == s.charAt(j)){
+                    arr[j] = 2 + diagonal;
+                }else{
+                    arr[j] = Math.max(arr[j], arr[j-1]);
+                }
+
+                diagonal = temp;
+            }
+        }
+
+        return arr[n-1];
+    }
+}
